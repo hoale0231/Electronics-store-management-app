@@ -85,7 +85,7 @@ exec insertSanPham @ID = 'TBLT00001',  @ProdName = 'Acer Nitro 5 Gaming AN515', 
 exec insertSanPham @ID = 'TBLT00002',  @ProdName = 'Lenovo Ideapad 5 Pro',  @PriceIn = 19000000,  @Price = 24000000,  @Insurance = 12,  @Other = 'LED keyboard',  @Manufacture = 'Lenovo',   @ProdType = 'Device', @Battery = '56.5Wh',  @DateRelease = '01-01-2021',  @Screen = '14", 2.2K (2240x1400)', @RAM = '8 GBDDR4 (On board) 3200 MHz',  @DeviceType = 'Laptop',  @CPU_Chip = 'i51135G72.4GHz',  @GPU = 'MX450 2GB',  @HardDisk = '512 GB SSD NVMe PCIe' 
 exec insertSanPham @ID = 'TBLT00004',  @ProdName = 'Asus ROG Zephyrus G14',  @PriceIn = 35500000,  @Price = 44990000,  @Insurance = 12,  @Other = 'LED keyboard',  @Manufacture = 'Asus',   @ProdType = 'Device', @Battery = '4-cell, 76Wh',  @DateRelease = '01-01-2021',  @Screen = '14", QHD (2560 x 1440), 120Hz', @RAM = '16 GBDDR4 3200 MHz',  @DeviceType = 'Laptop',  @CPU_Chip = 'Ryzen 95900HS3GHz',  @GPU = 'RTX 3050Ti 4GB',  @HardDisk = '1 TB SSD M.2 PCIe 3.0'
 exec insertSanPham @ID = 'TBLT00005',  @ProdName = 'MacBook Pro 2020',  @PriceIn = 35000000,  @Price = 42500000,  @Insurance = 18,  @Other = 'LED keyboard',  @Manufacture = 'Apple',   @ProdType = 'Device', @Battery = '10 hours' ,  @DateRelease = '01-01-2020',  @Screen = '13.3", Retina (2560 x 1600)', @RAM = '16 GB',  @DeviceType = 'Laptop',  @CPU_Chip = 'Apple M1',  @GPU = 'integrated card, 8 core GPU',  @HardDisk = '512 GB SSD'
-
+exec insertSanPham @ID = 'TBLT00007',  @ProdName = 'GIGABYTE Gaming G5',  @PriceIn = 22500000,  @Price = 28000000,  @Insurance = 12,  @Other = 'LED keyboard',  @Manufacture = 'Gigabyte',   @ProdType = 'Device', @Battery = '4-cell, 41Wh',  @DateRelease = '01-01-2021',  @Screen = '15.6", Full HD (1920 x 1080), 144Hz', @RAM = '16 GBDDR4 3200 MHz',  @DeviceType = 'Laptop',  @CPU_Chip = 'i510500H2.5GHz',  @GPU = 'RTX 3060 6GB',  @HardDisk = '512 GB SSD NVMe PCIe' 
 -- Insert DienThoai
 exec insertSanPham @ID = 'TBDT00001',  @ProdName = 'Samsung Galaxy Z Fold3',  @PriceIn = 18000000,  @Price = 22990000,  @Insurance = 12,  @Other = NULL,  @Manufacture = 'Samsung',   @ProdType = 'Device', @Battery = '4400 mAh, 25 W',  @DateRelease = '01-01-2021',  @Screen = 'Dynamic AMOLED 2X Full HD+', @RAM = '12 GB',  @DeviceType = 'Phone',  @CPU_Chip = 'Snapdragon 888',  @Camera = '10 MP & 4 MP',  @HardDisk = '512 GB', @SIM = '2 Nano SIM + 1 eSIM, 5G'    
 exec insertSanPham @ID = 'TBDT00002',  @ProdName = 'iPhone 12 64GB',  @PriceIn = 15000000,  @Price = 20990000,   @Insurance = 12,  @Other = NULL,  @Manufacture = 'Apple',   @ProdType = 'Device', @Battery = '2815 mAh, 20 W',  @DateRelease = '01-01-2020',  @Screen = 'OLED6.1" Super Retina XDR', @RAM = '4 GB',  @DeviceType = 'Phone',  @CPU_Chip = 'Apple A14 Bionic',  @Camera = '12 MP',  @HardDisk = '64 GB', @SIM = '1 Nano SIM & 1 eSIM, 5G'    
@@ -224,20 +224,20 @@ insert into SDTChiNhanh (ID_Branch, Phone) values
 go
 
 insert into ChiNhanh_Ban_SanPham (ID_Prod, ID_Branch, Quantity) values
-('TBLT00001', '1', 100), ('TBLT00002', '1', 100), ('TBLT00003', '1', 100), ('TBLT00004', '1', 100), ('TBLT00005', '1', 100),
-('TBDT00001', '1', 100), ('TBDT00002', '1', 100), ('TBDT00003', '1', 100), ('TBDT00004', '1', 100), ('TBDT00005', '1', 100), 
-('TBMB00001', '1', 100), ('TBMB00002', '1', 100), ('TBMB00003', '1', 100), ('TBMB00004', '1', 100), 
-('PKCH00001', '1', 100), ('PKCH00002', '1', 100), ('PKCH00003', '1', 100), ('PKCH00004', '1', 100), ('PKCH00005', '1', 100), ('PKCH00006', '1', 100), ('PKCH00007', '1', 100), ('PKCH00008', '1', 100), ('PKCH00009', '1', 100),
-('PKTN00001', '1', 100), ('PKTN00002', '1', 100), ('PKTN00003', '1', 100), ('PKTN00004', '1', 100), ('PKTN00005', '1', 100), ('PKTN00006', '1', 100), ('PKTN00007', '1', 100), ('PKTN00008', '1', 100), ('PKTN00009', '1', 100),
-('TBLT00001', '2', 100), ('TBLT00002', '2', 100), ('TBLT00003', '2', 100), ('TBLT00004', '2', 100), ('TBLT00005', '2', 100),
-('TBDT00001', '2', 100), ('TBDT00002', '2', 100), ('TBDT00003', '2', 100), ('TBDT00004', '2', 100), ('TBDT00005', '2', 100), 
-('TBMB00001', '2', 100), ('TBMB00002', '2', 100), ('TBMB00003', '2', 100), ('TBMB00004', '2', 100), 
-('PKCH00001', '2', 100), ('PKCH00002', '2', 100), ('PKCH00003', '2', 100), ('PKCH00004', '2', 100), ('PKCH00005', '2', 100), ('PKCH00006', '2', 100), ('PKCH00007', '2', 100), ('PKCH00008', '2', 100), ('PKCH00009', '2', 100),
-('PKTN00001', '2', 100), ('PKTN00002', '2', 100), ('PKTN00003', '2', 100), ('PKTN00004', '2', 100), ('PKTN00005', '2', 100), ('PKTN00006', '2', 100), ('PKTN00007', '2', 100), ('PKTN00008', '2', 100), ('PKTN00009', '2', 100),
-('TBLT00001', '3', 100), ('TBLT00002', '3', 100), ('TBLT00003', '3', 100), ('TBLT00004', '3', 100), ('TBLT00005', '3', 100),
-('TBDT00001', '3', 200), ('TBDT00002', '3', 200), ('TBDT00003', '3', 200), ('TBDT00004', '3', 200), ('TBDT00005', '3', 200), 
-('TBMB00001', '3', 200), ('TBMB00002', '3', 200), ('TBMB00003', '3', 200), ('TBMB00004', '3', 200), 
-('PKCH00001', '3', 200), ('PKCH00002', '3', 200), ('PKCH00003', '3', 200), ('PKCH00004', '3', 200), ('PKCH00005', '3', 200), ('PKCH00006', '3', 200), ('PKCH00007', '3', 200), ('PKCH00008', '3', 200), ('PKCH00009', '3', 200);
+('TBLT00001', '1', 10), ('TBLT00002', '1', 50), ('TBLT00007', '1', 30), ('TBLT00004', '1', 33), ('TBLT00005', '1', 60),
+('TBDT00001', '1', 30), ('TBDT00002', '1', 40), ('TBDT00003', '1', 35), ('TBDT00004', '1', 46), ('TBDT00005', '1', 30), 
+('TBMB00001', '1', 10), ('TBMB00002', '1', 50), ('TBMB00003', '1', 30), ('TBMB00004', '1', 33), 
+('PKCH00001', '1', 30), ('PKCH00002', '1', 40), ('PKCH00003', '1', 35), ('PKCH00004', '1', 46), ('PKCH00005', '1', 20), ('PKCH00006', '1', 10), ('PKCH00007', '1', 50), ('PKCH00008', '1', 100), ('PKCH00009', '1', 70),
+('PKTN00001', '1', 10), ('PKTN00002', '1', 50), ('PKTN00003', '1', 30), ('PKTN00004', '1', 33), ('PKTN00005', '1', 20), ('PKTN00006', '1', 90), ('PKTN00007', '1', 80), ('PKTN00008', '1', 50), ('PKTN00009', '1', 60),
+('TBLT00001', '2', 30), ('TBLT00002', '2', 40), ('TBLT00007', '2', 35), ('TBLT00004', '2', 46), ('TBLT00005', '2', 20),
+('TBDT00001', '2', 10), ('TBDT00002', '2', 50), ('TBDT00003', '2', 30), ('TBDT00004', '2', 33), ('TBDT00005', '2', 40), 
+('TBMB00001', '2', 30), ('TBMB00002', '2', 40), ('TBMB00003', '2', 35), ('TBMB00004', '2', 46), 
+('PKCH00001', '2', 10), ('PKCH00002', '2', 50), ('PKCH00003', '2', 30), ('PKCH00004', '2', 33), ('PKCH00005', '2', 20), ('PKCH00006', '2', 10), ('PKCH00007', '2', 50), ('PKCH00008', '2', 100), ('PKCH00009', '2', 70),
+('PKTN00001', '2', 30), ('PKTN00002', '2', 40), ('PKTN00003', '2', 35), ('PKTN00004', '2', 46), ('PKTN00005', '2', 20), ('PKTN00006', '2', 90), ('PKTN00007', '2', 80), ('PKTN00008', '2', 50), ('PKTN00009', '2', 60),
+('TBLT00001', '3', 10), ('TBLT00002', '3', 50), ('TBLT00007', '3', 30), ('TBLT00004', '3', 33), ('TBLT00005', '3', 90),
+('TBDT00001', '3', 30), ('TBDT00002', '3', 40), ('TBDT00003', '3', 35), ('TBDT00004', '3', 46), ('TBDT00005', '3', 30), 
+('TBMB00001', '3', 20), ('TBMB00002', '3', 50), ('TBMB00003', '3', 30), ('TBMB00004', '3', 33), 
+('PKCH00001', '3', 30), ('PKCH00002', '3', 40), ('PKCH00003', '3', 35), ('PKCH00004', '3', 46), ('PKCH00005', '3', 200), ('PKCH00006', '3', 200), ('PKCH00007', '3', 200), ('PKCH00008', '3', 200), ('PKCH00009', '3', 200);
 
 -- Insert Khach hang
 insert into KhachHang (ID, Username, Passwd, Phone, Fname, Lname, Email, Bdate, IdNum, FamScore) values

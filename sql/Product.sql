@@ -1,26 +1,26 @@
 use db_a2
 go
-use company
+
 EXEC sys.sp_addmessage  
 	@msgnum   = 51000  
 	,@severity = 16  
 	,@msgtext  = N'Product type much be Device or Accessory' 
-	,@lang = 'us_english';  
-go;
+	,@lang = 'us_english'
+go
 
 EXEC sys.sp_addmessage  
 	@msgnum   = 51001 
 	,@severity = 16  
 	,@msgtext  = N'Price much larger 1.2 PriceIn' 
-	,@lang = 'us_english';  
-go;
+	,@lang = 'us_english'
+go
 
 EXEC sys.sp_addmessage  
 	@msgnum   = 52000 
 	,@severity = 16  
 	,@msgtext  = N'%s is not valid!' 
-	,@lang = 'us_english';  
-go;
+	,@lang = 'us_english'
+go
 
 -- Câu 4
 
@@ -161,8 +161,8 @@ begin
 				throw 51001, @msg1, 1;
 			end
 		-- insert Sanpham
-		insert into SanPham ( ID,   ProdName,  PriceIn,  Price, Insurance,  Other, ProdType, manufacture,  TotalQuantity) 
-		values				( @ID, @ProdName, @PriceIn, @Price, @Insurance, @Other, @ProdType,  @manufacture, 0)
+		insert into SanPham ( ID,   ProdName,  PriceIn,  Price, Insurance,  Other, ProdType, manufacture,  TotalQuantity,  Available) 
+		values				( @ID, @ProdName, @PriceIn, @Price, @Insurance, @Other, @ProdType,  @manufacture, 0, 1)
 
 		if (@ProdType = 'Device')
 			begin

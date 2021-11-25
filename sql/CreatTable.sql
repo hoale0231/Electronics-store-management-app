@@ -1,5 +1,4 @@
-﻿drop database db_a2;
-create database db_a2;
+﻿create database db_a2;
 go
 
 use db_a2;
