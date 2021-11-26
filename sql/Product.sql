@@ -22,7 +22,7 @@ EXEC sys.sp_addmessage
 	,@lang = 'us_english'
 go
 
--- Câu 4
+-- Cï¿½u 4
 
 create or alter function getValidSanPhamID(@ProdType nvarchar(100), @DeviceType nvarchar(100))
 returns char(9)
@@ -116,7 +116,7 @@ select ID, price, dbo.getCurrentPrice(ID) as currentPrice
 from SanPham
 where Price != dbo.getCurrentPrice(ID)
 go
--- Câu 1 
+-- Cï¿½u 1 
 create or alter procedure insertSanPham
 		-- Sanpham
 		@ID          CHAR(9)		= NULL,
@@ -213,13 +213,13 @@ begin
 	set xact_abort off;
 END;
 go
-
+delete from SanPham where ID = 'PKCH00001'
 delete from SanPham where ID = 'TBLT00007'
 exec insertSanPham @ID = 'TBLT00007',  @ProdName = 'GIGABYTE Gaming G5',  @PriceIn = 22500000,  @Price = 28000000,  @Insurance = 12,  @Other = 'LED keyboard',  @Manufacture = 'Gigabyte',   @ProdType = 'Device', @Battery = '4-cell, 41Wh',  @DateRelease = '01-01-2021',  @Screen = '15.6", Full HD (1920 x 1080), 144Hz', @RAM = '16 GBDDR4 3200 MHz',  @DeviceType = 'Laptop',  @CPU_Chip = 'i510500H2.5GHz',  @GPU = 'RTX 3060 6GB',  @HardDisk = '512 GB SSD NVMe PCIe' 
 exec insertSanPham @ID = 'TBDT00007',  @ProdName = 'GIGABYTE Gaming G5',  @PriceIn = 22500000,  @Price = 28000000,  @Insurance = 12,  @Other = 'LED keyboard',  @Manufacture = 'Gigabyte',   @ProdType = 'Device', @Battery = '4-cell, 41Wh',  @DateRelease = '01-01-2021',  @Screen = '15.6", Full HD (1920 x 1080), 144Hz', @RAM = '16 GBDDR4 3200 MHz',  @DeviceType = 'Laptop',  @CPU_Chip = 'i510500H2.5GHz',  @GPU = 'RTX 3060 6GB',  @HardDisk = '512 GB SSD NVMe PCIe' 
 go
 
--- Câu 2
+-- Cï¿½u 2
 create or alter trigger update_price on SanPham
 after insert, update
 as begin
@@ -297,7 +297,7 @@ as	begin
 	end;
 go
 
--- Câu 3
+-- Cï¿½u 3
 create or alter procedure getInfoProduct (@ID char(9))
 as 
 begin
@@ -330,7 +330,7 @@ exec getInfoProduct @ID = 'TBMB00001'
 go
 
 create or alter procedure getProductsOfType 
-(@Type nvarchar(100), @DESC int = 0, @orderBy varchar(100), @qty int = 5, @offset int = 0)
+(@Type nvarchar(100) = 'All', @DESC int = 0, @orderBy varchar(100) = NULL, @qty int = 5, @offset int = 0)
 as	begin
 		declare @idType char(4);	
 		set @idType = case @Type
@@ -346,30 +346,33 @@ as	begin
 		select top (@qty) * from 
 		(select SanPham.ID as ID, ProdName, PriceIn, Price, dbo.getCurrentPrice(SanPham.ID) as CurrentPrice, Insurance, TotalQuantity 
 		from SanPham
-		where left(SanPham.ID, 4) = @idType
+		where @Type = 'All' or left(SanPham.ID, 4) = @idType
 		order by 
 				case @DESC when 0 then
 				case @orderBy
+					when 'ProdName' then ProdName
 					when 'Price' then Price
 					when 'PriceIn' then PriceIn
 					when 'CurrPrice' then dbo.getCurrentPrice(SanPham.ID)
 					when 'Insurance' then Insurance
 					when 'TotalQuantity' then TotalQuantity
-					else ID
+					else right(ID, 4)
 				end end asc,
 				case @DESC when 1 then
 				case @orderBy
+					when 'ProdName' then ProdName
 					when 'Price' then Price
 					when 'PriceIn' then PriceIn
 					when 'CurrPrice' then dbo.getCurrentPrice(SanPham.ID)
 					when 'Insurance' then Insurance
 					when 'TotalQuantity' then TotalQuantity
-					else ID
+					else right(ID, 4)
 				end end desc
 		offset (@offset * @qty) rows) T
 end
 go
 
+exec getProductsOfType @Type = 'All'
 exec getProductsOfType @Type = 'Mouse', @orderBy = 'CurrPrice'
 exec getProductsOfType @Type = 'Mouse', @orderBy = 'CurrPrice', @offset = 1
 exec getProductsOfType @Type = 'HeadPhone', @orderBy = 'Insurance', @qty = 2, @desc = 1

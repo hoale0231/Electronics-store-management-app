@@ -80,6 +80,84 @@ begin
 END;
 go
 
+create or alter trigger update_price on SanPham
+after insert, update
+as begin
+	set nocount on;
+	set xact_abort on;
+	BEGIN TRANSACTION;
+		declare @price int, @priceIn int;
+		declare priceCursor cursor for select PriceIn, Price from inserted;
+		open priceCursor;
+		fetch next from priceCursor into @priceIn, @price;
+		while @@FETCH_STATUS = 0
+		begin
+			if @price < @priceIn * 1.2
+				begin
+					DECLARE @msg NVARCHAR(2048) = FORMATMESSAGE(51001);  
+					throw 51001, @msg, 1;
+				end
+			
+			fetch next from priceCursor into @priceIn, @price;
+		end
+		close priceCursor;
+		deallocate priceCursor;
+	COMMIT TRANSACTION;
+	set nocount off;
+	set xact_abort off;
+	end;
+go
+
+update SanPham
+set price = 2, PriceIn = 2
+where ID = 'TBLT00001'
+go
+
+create or alter trigger update_totalQuantity on ChiNhanh_Ban_SanPham
+after insert, update, delete
+as	begin
+	set nocount on;
+	set xact_abort on;
+	BEGIN TRANSACTION;
+		declare @Qty int, @prodID char(9);
+		-- on insert
+		declare productCursor cursor for select ID_Prod, Quantity from inserted;
+		open productCursor;
+		fetch next from productCursor into @prodID, @Qty;
+		while @@FETCH_STATUS = 0
+		begin
+			if @Qty < 0
+				begin
+					DECLARE @msg NVARCHAR(2048) = FORMATMESSAGE(52000, 'Quantity');  
+					throw 52000, @msg, 1;
+				end
+			update SanPham
+			set TotalQuantity = (select TotalQuantity from SanPham where ID = @prodID) + @Qty
+			where ID = @prodID
+			fetch next from productCursor into @prodID, @Qty;
+		end
+		close productCursor;
+		deallocate productCursor;
+		-- on delete
+		declare productCursor cursor for select ID_Prod, Quantity from deleted;
+		open productCursor;
+		fetch next from productCursor into @prodID, @Qty;
+		while @@FETCH_STATUS = 0
+		begin
+			update SanPham
+			set TotalQuantity = (select TotalQuantity from SanPham where ID = @prodID) - @Qty
+			where ID = @prodID
+			fetch next from productCursor into @prodID, @Qty;
+		end
+		close productCursor;
+		deallocate productCursor;
+	commit TRANSACTION;
+	set nocount off;
+	set xact_abort off;
+	end;
+go
+
+
 -- insert Laptop
 exec insertSanPham @ID = 'TBLT00001',  @ProdName = 'Acer Nitro 5 Gaming AN515',  @PriceIn = 23000000,  @Price = 29690000,  @Insurance = 12,  @Other = 'LED keyboard',  @Manufacture = 'Acer',   @ProdType = 'Device', @Battery = '4-cell, 57Wh',  @DateRelease = '01-01-2021',  @Screen = '15.6", FullHD (1920 x 1080), 144Hz', @RAM = '8 GBDDR4 3200 MHz',  @DeviceType = 'Laptop',  @CPU_Chip = 'i711800H2.30 GHz',  @GPU = 'RTX 3050Ti 4GB',  @HardDisk = '512 GB SSD NVMe PCIe'
 exec insertSanPham @ID = 'TBLT00002',  @ProdName = 'Lenovo Ideapad 5 Pro',  @PriceIn = 19000000,  @Price = 24000000,  @Insurance = 12,  @Other = 'LED keyboard',  @Manufacture = 'Lenovo',   @ProdType = 'Device', @Battery = '56.5Wh',  @DateRelease = '01-01-2021',  @Screen = '14", 2.2K (2240x1400)', @RAM = '8 GBDDR4 (On board) 3200 MHz',  @DeviceType = 'Laptop',  @CPU_Chip = 'i51135G72.4GHz',  @GPU = 'MX450 2GB',  @HardDisk = '512 GB SSD NVMe PCIe' 

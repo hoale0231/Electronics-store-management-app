@@ -11,7 +11,7 @@ import {Navbar, Container, Nav} from 'react-bootstrap';
 
 function NavBarHeader() {
   return (
-    <Navbar bg="secondary" expand="lg">
+    <Navbar style={{backgroundColor: "rgb(2, 80, 80)"}} expand="lg" fixed="top">
       <Container>
         <Navbar.Brand href="/">Home</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -32,7 +32,7 @@ function NavBarHeader() {
 function App() {
   return (
     <div>
-      <NavBarHeader/>
+      <NavBarHeader fixed="top"/>
       <Router>
         <Routes>
           <Route path="/Product" element={<Product/>}/>
