@@ -1,5 +1,5 @@
 import flask
-import pyodbc 
+import pyodbc
 
 Product = flask.Blueprint('Product', __name__)
 
