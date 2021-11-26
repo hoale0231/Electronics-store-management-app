@@ -4,6 +4,7 @@ create or alter procedure applySalesForBrand
 		@brandName	nvarchar(100)
 as
 begin
+	SET NOCOUNT ON;
 	if not EXISTS(select * from CTKM_SanPham where ID = @salesID)
 	begin
 		RAISERROR('No sales with ID: %s', 16, 1, @salesID);
@@ -20,6 +21,7 @@ begin
 	select SanPham.ID, CTKM_SanPham.ID
 	from CTKM_SanPham, SanPham
 	where CTKM_SanPham.ID = @salesID and SanPham.manufacture = @brandName
+	SET NOCOUNT OFF;
 end
 go
 
@@ -31,6 +33,7 @@ on SanPham_ApDung_CTKM
 for insert, update
 as
 begin
+	SET NOCOUNT ON;
 	select Price, PriceIn, PromoLevel
 	into #PriceCheck
 	from SanPham, inserted, CTKM_SanPham
@@ -59,6 +62,17 @@ begin
 		RAISERROR ('A product cannot have 2 overlapping sales.', 16, 1);
 		rollback TRANSACTION;
 	end
+
+		if (EXISTS(select *
+				from #TimeCheck, inserted, CTKM_SanPham
+				where #TimeCheck.ID_Prod = inserted. ID_Prod and inserted.ID_Ad = CTKM_SanPham.ID 
+						and CTKM_SanPham.TimeStart <= #TimeCheck.TimeStart
+						and #TimeCheck.TimeStart <= CTKM_SanPham.TimeEnd))
+	begin
+		RAISERROR ('A product cannot have 2 overlapping sales.', 16, 1);
+		rollback TRANSACTION;
+	end
+	SET NOCOUNT OFF;
 end
 
 --Trigger 2
@@ -68,6 +82,7 @@ on CTKM_SanPham
 for insert, update
 as
 begin
+	SET NOCOUNT ON;
 	if EXISTS(select * from inserted where ID NOT LIKE('KMSP%'))
 	begin
 		RAISERROR('Invalid ID format. ID has to start with KMSP', 16, 1)
@@ -115,6 +130,7 @@ begin
 	delete from SanPham_ApDung_CTKM
 	where ID_Prod in (select ID_Prod from #TimeInvalidItem) and
 		ID_Ad in (select ID_Ad from #TimeInvalidItem)
+	SET NOCOUNT OFF;
 end
 
 
@@ -127,6 +143,7 @@ create or alter procedure getSalesByProduct
 		@EndTime date
 as
 	begin
+		SET NOCOUNT ON;
 		select ID_Prod, ProdName, ID_Ad, TimeStart, TimeEnd, PromoLevel
 		from CTKM_SanPham, SanPham_ApDung_CTKM, SanPham
 		where SanPham_ApDung_CTKM.ID_Prod = @Id_Prod and
@@ -135,6 +152,7 @@ as
 			  CTKM_SanPham.TimeStart <= @EndTime and 
 			  SanPham.ID = @Id_Prod
 		order by TimeStart
+		SET NOCOUNT OFF;
 	end;
 
 
@@ -146,6 +164,7 @@ create or alter procedure getTopDealsOfBrand
 		@EndTime date
 as
 begin
+	SET NOCOUNT ON;
 	select MaxDeal.manufacture, SanPham.ID as ID_Prod, ProdName, TimeStart, TimeEnd, PromoLevel
 	from (select manufacture, MAX(CTKM_SanPham.PromoLevel) as maxRate
 			from SanPham, CTKM_SanPham, SanPham_ApDung_CTKM
@@ -160,7 +179,7 @@ begin
 		  MaxDeal.manufacture = SanPham.manufacture and
 		  MaxDeal.maxRate = CTKM_SanPham.PromoLevel
 	order by CTKM_SanPham.TimeStart
-
+	SET NOCOUNT OFF;
 end
 
 /*-----------------------------------------------------------------------------------------------------------------*/
@@ -219,8 +238,6 @@ begin
 	return @total;
 end
 go
-
-select dbo.getSoldSalesItem('PKCH00002', 'KMSP00001') as total
 
 --Ex4b
 -- Tim chuong trinh khuyen mai co ti le khuyen mai cao nhat cua 1 mat hang o thoi diem hien tai
