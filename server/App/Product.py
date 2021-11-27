@@ -1,14 +1,8 @@
 import flask
 import pyodbc
+from .DBS import cursor
 
 Product = flask.Blueprint('Product', __name__)
-
-cnxn = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
-                      "Server=WICII;"
-                      "Database=db_a2;"
-                      "Trusted_Connection=yes;")
-
-cursor = cnxn.cursor()
     
 @Product.route("/api/product/all", methods = ["GET"])
 def queryProducts():
@@ -37,17 +31,35 @@ def queryProducts():
 
     if query[-1] == ",":
         query = query[:-1]
-    print(query)
+
     try:
         cursor.execute(query)
     except pyodbc.Error as err:
         print(err)
+        return flask.Response(err.args[1], status=400)
         
-    return flask.jsonify([{"ID": row.ID, 
-                           "ProdName": row.ProdName, 
-                           "PriceIn": row.PriceIn, 
-                           "Price": row.Price, 
-                           "CurrentPrice": row.CurrentPrice, 
-                           "Insurance": row.Insurance, 
-                           "TotalQuantity": row.TotalQuantity} 
-                          for row in cursor])
+    colNames = [column[0] for column in cursor.description]
+    results = [dict(zip(colNames, row)) for row in cursor]
+    
+    return flask.jsonify(results)
+
+@Product.route("/api/product/info", methods = ["GET"])
+def queryInfo():
+    id = flask.request.args.get("id")
+    
+    if id == None:
+        return flask.Response("Much provide ID!!", status=400)
+    
+    query = "exec getInfoProduct @ID = ?"
+    
+    try:
+        cursor.execute(query, id)
+    except pyodbc.Error as err:
+        print(err)
+        return flask.Response(err.args[1], status=400)
+    
+    colNames = [column[0] for column in cursor.description]
+    results = dict(zip(colNames, cursor.fetchone()))
+    
+    return flask.jsonify(results)
+    

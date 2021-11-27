@@ -43,9 +43,15 @@
 .popup {
   position: relative;
   margin: auto;
+  height: 50%;
   margin-top: calc(20vh);
   background: #fff;
+  
+}
+
+.body-popup {
   overflow: auto;
+  height: 400px;
 }
 
 .loadButton {

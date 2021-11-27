@@ -141,7 +141,7 @@ export default function Product() {
         <Button variant="success" onClick={() => {loadData(false)}}>Load More</Button>
       </div>
       <div>
-        {productDescription.id === -1 ? <p/> : <ProductDescription data={productDescription} 
+        {productDescription.id === -1 ? <p/> : <ProductDescription id={productDescription.ID} 
           setproductDescription={setproductDescription} deleteProduct={deleteProduct} action={'Edit Product'}/>}
       </div>
     </div>
@@ -149,7 +149,28 @@ export default function Product() {
 }
 
 function ProductDescription(props) {
-  const {data, setproductDescription, deleteProduct, action} = props
+  const {id, setproductDescription, deleteProduct, action} = props
+  const [info, setInfo] = useState({})
+
+  useEffect(() => {
+    fetch("/api/product/info?id="+id)
+    .then((response) => {
+      if (response.ok) {
+        return response.json()
+      } 
+      throw response
+    })
+    .then((data) => {setInfo(data)})
+    .catch((error) => {
+      console.error("Error fetching data: ", error);
+    })
+  }, [id])
+  
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    console.log(event.target[0].value)
+  }
+
   return(
     <div className="popup-background">
       <Modal.Dialog className="popup">
@@ -157,30 +178,23 @@ function ProductDescription(props) {
           <Modal.Title>{action}</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body>
+        <Modal.Body className="body-popup">
           <Form>
-            <Form.Group className="mb-3" controlId="formBasicEmail">
-              <Form.Label>Product ID</Form.Label>
-              <Form.Control type="ID" placeholder="Enter Product ID" />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="formBasicPassword">
-              <Form.Label>Password</Form.Label>
-              <Form.Control type="password" placeholder="Password" />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="formBasicCheckbox">
-              <Form.Check type="checkbox" label="Check me out" />
-            </Form.Group>
-            
-            <Button variant="primary" type="submit">
+            {Object.keys(info).map( (k) => 
+              <Form.Group className="mb-3" controlId="formBasicEmail">
+                <Form.Label>{k}</Form.Label>
+                <Form.Control type="ID" placeholder={"Enter " + k} defaultValue={info[k]}/>
+              </Form.Group>
+            )}
+      
+            <Button variant="primary" type="submit" onSubmit={handleSubmit}>
               Submit
             </Button>
           </Form>
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="danger" onClick={() => {deleteProduct(data.id); setproductDescription({id: -1})}}>Delete</Button>
+          <Button variant="danger" onClick={() => {deleteProduct(id); setproductDescription({id: -1})}}>Delete</Button>
           <Button variant="primary">Save changes</Button>
         </Modal.Footer>
       </Modal.Dialog>

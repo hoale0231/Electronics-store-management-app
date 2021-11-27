@@ -1,17 +1,8 @@
 import pyodbc
 from flask import *
+from .DBS import cursor
 
 Sales = Blueprint('Sales', __name__)
-
-# Connect to MS SqlServer. Change serverName if needed
-serverName = "DESKTOP-7VMMVHB\SQLEXPRESS"
-databaseName = "db_a2"
-conn = pyodbc.connect('Driver={SQL Server};'
-                    'Server=' + serverName + ';'
-                    'Database=' + databaseName + ';'
-                    'Trusted_Connection=yes;' +
-                    'ansi=True')
-cursor = conn.cursor()
 
 @Sales.route("/sales-info/all", methods=["GET"])
 def getAllSales():

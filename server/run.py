@@ -1,5 +1,4 @@
 from flask import Flask
-import pyodbc
 from App.Product import Product
 from App.Sales import Sales
 from App.Toai import Toai
