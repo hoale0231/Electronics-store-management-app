@@ -121,12 +121,13 @@ create or alter procedure insertSanPham
 		-- Sanpham
 		@ID          CHAR(9)		= NULL,
 		@ProdName    nvarchar(100),
-		@PriceIn     INT			= NULL,
-		@Price       INT			= NULL,
+		@PriceIn     INT,
+		@Price       INT,
 		@Insurance   INT			= NULL,
 		@Other       nvarchar(100),
 		@Manufacture nvarchar(100),
 		@ProdType	 nvarchar(100),
+		@Available   bit			= 1,
 		-- ThietBiDienTu
 		@Battery     nvarchar(100)	= NULL,
 		@DateRelease DATE			= NULL,
@@ -162,7 +163,7 @@ begin
 			end
 		-- insert Sanpham
 		insert into SanPham ( ID,   ProdName,  PriceIn,  Price, Insurance,  Other, ProdType, manufacture,  TotalQuantity,  Available) 
-		values				( @ID, @ProdName, @PriceIn, @Price, @Insurance, @Other, @ProdType,  @manufacture, 0, 1)
+		values				( @ID, @ProdName, @PriceIn, @Price, @Insurance, @Other, @ProdType,  @manufacture, 0, @Available)
 
 		if (@ProdType = 'Device')
 			begin
@@ -301,32 +302,32 @@ go
 create or alter procedure getInfoProduct (@ID char(9))
 as 
 begin
-	if @ID like '[T][B][L][T]%'
+	if left(@ID, 4) = 'TBLT'
 		select * from SanPham P, ThietBiDienTu T, Laptop D
 		where P.ID = @ID and T.ID = @ID and D.ID = @ID
-	else if @ID like '[T][B][D][T]%'
+	else if left(@ID, 4) = 'TBDT'
 		select * from SanPham P, ThietBiDienTu T, DienThoai D
 		where P.ID = @ID and T.ID = @ID and D.ID = @ID
-	else if @ID like '[T][B][M][B]%'
+	else if left(@ID, 4) = 'TBMB'
 		select * from SanPham P, ThietBiDienTu T, MayTinhBang D
 		where P.ID = @ID and T.ID = @ID and D.ID = @ID
-	else if @ID like '[P][K][C][H]%'
+	else if left(@ID, 4) = 'PKCH'
 		select * from SanPham P, PhuKien T, Chuot D
 		where P.ID = @ID and T.ID = @ID and D.ID = @ID
-	else if @ID like '[P][K][T][N]%'
+	else if left(@ID, 4) = 'PKTN'
 		select * from SanPham P, PhuKien T, TaiNghe D
 		where P.ID = @ID and T.ID = @ID and D.ID = @ID
-	else if @ID like '[T][B][K][H]%'
+	else if left(@ID, 4) = 'TBKH'
 		select * from SanPham P, ThietBiDienTu T
 		where P.ID = @ID and T.ID = @ID
-	else if @ID like '[P][K][K][H]%'
+	else if left(@ID, 4) = 'PKKH'
 		select * from SanPham P, PhuKien T
 		where P.ID = @ID and T.ID = @ID
 	else select * from SanPham P where P.ID = @ID
 end
 go
 
-exec getInfoProduct @ID = 'TBMB00001' 
+exec getInfoProduct @ID = 'PKCH00001' 
 go
 
 create or alter procedure getProductsOfType 
@@ -394,3 +395,73 @@ create or alter procedure getSummaryProduct (@ProdType nvarchar(100) = NULL) as
 go
 
 exec getSummaryProduct @ProdType = 'Accessory'
+go
+
+create or alter procedure updateSanPham
+		-- Sanpham
+		@ID          CHAR(9),
+		@ProdName    nvarchar(100),
+		@PriceIn     INT,
+		@Price       INT,
+		@Insurance   INT,
+		@Other       nvarchar(100),
+		@Manufacture nvarchar(100),
+		@Available   bit,
+		-- ThietBiDienTu
+		@Battery     nvarchar(100),
+		@DateRelease DATE,
+		@Screen      nvarchar(100),
+		@RAM         nvarchar(100),
+		@CPU_Chip    nvarchar(100),
+		@GPU         nvarchar(100),
+		@HardDisk    nvarchar(100),
+		@Camera		 nvarchar(100),
+		@SIM         nvarchar(100),
+		-- PhuKien
+		@Connection	varchar(100),
+		@DPI varchar(100)		,
+		@HPhoneType varchar(100)
+as 
+begin 
+    set nocount on;
+	set xact_abort on;
+	BEGIN TRANSACTION;
+		-- insert Sanpham
+		update SanPham 
+		set ProdName = @ProdName, PriceIn = @Price,  Price = @Price, Insurance = @Insurance, Other = @Other, manufacture = @Manufacture,  Available = @Available
+		where ID = @ID;
+
+		update ThietBiDienTu
+		set Battery = @Battery, Screen = @Screen, DateRelease = @DateRelease, Ram = @RAM
+		where ID = @ID;
+
+		update PhuKien
+		set Connection = @Connection
+		where ID = @ID;
+
+		update Laptop
+		set GPU = @GPU, CPU = @CPU_Chip, HardDisk = @HardDisk
+		where ID = @ID
+
+		update DienThoai
+		set Chip = @CPU_Chip, Camera = @Camera, SIM = @SIM, InDisk = @HardDisk
+		where ID = @ID
+
+		update MayTinhBang
+		set Chip = @CPU_Chip, Camera = @Camera, InDisk = @HardDisk
+		where ID = @ID
+
+		update Chuot
+		set DPI = @DateRelease
+		where ID = @ID
+
+		update TaiNghe
+		set HPhoneType = @HPhoneType
+		where ID = @ID
+		
+	COMMIT TRANSACTION;
+	set nocount off;
+	set xact_abort off;
+END;
+go
+

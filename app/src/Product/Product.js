@@ -1,6 +1,7 @@
 import BootstrapTable from "react-bootstrap-table-next";
-import {Modal, Button, Form, Row, Col, FloatingLabel} from 'react-bootstrap'
+import {Button, Form, Row, Col, FloatingLabel} from 'react-bootstrap'
 import { useState, useEffect } from "react";
+import ProductDescription from "./ProductDescription";
 
 var offset = 0;
 var filter = 'All'
@@ -16,13 +17,12 @@ export default function Product() {
   // const [desc, setDesc] = useState(0);
   
   const columns = [
-    { dataField: "ID",            text: "Product ID",     sort: true },
-    { dataField: "ProdName",      text: "Product Name",   sort: true },
-    { dataField: "PriceIn",       text: "Import Price ",  sort: true },
-    { dataField: "Price",         text: "Default Price",  sort: true },
-    { dataField: "CurrentPrice",     text: "Current Price",  sort: true },
-    { dataField: "Insurance",     text: "Insurance",      sort: true },
-    { dataField: "TotalQuantity", text: "Total Quantity", sort: true }
+    { dataField: "ID",            text: "Product ID",     },
+    { dataField: "ProdName",      text: "Product Name",   },
+    { dataField: "PriceIn",       text: "Import Price ",  },
+    { dataField: "Price",         text: "Default Price",  },
+    { dataField: "CurrentPrice",     text: "Current Price",  },
+    { dataField: "TotalQuantity", text: "Total Quantity", }
   ];
 
   useEffect(() => {
@@ -148,56 +148,3 @@ export default function Product() {
   );
 }
 
-function ProductDescription(props) {
-  const {id, setproductDescription, deleteProduct, action} = props
-  const [info, setInfo] = useState({})
-
-  useEffect(() => {
-    fetch("/api/product/info?id="+id)
-    .then((response) => {
-      if (response.ok) {
-        return response.json()
-      } 
-      throw response
-    })
-    .then((data) => {setInfo(data)})
-    .catch((error) => {
-      console.error("Error fetching data: ", error);
-    })
-  }, [id])
-  
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(event.target[0].value)
-  }
-
-  return(
-    <div className="popup-background">
-      <Modal.Dialog className="popup">
-        <Modal.Header closeButton onClick={() => setproductDescription({id:-1})}>
-          <Modal.Title>{action}</Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body className="body-popup">
-          <Form>
-            {Object.keys(info).map( (k) => 
-              <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label>{k}</Form.Label>
-                <Form.Control type="ID" placeholder={"Enter " + k} defaultValue={info[k]}/>
-              </Form.Group>
-            )}
-      
-            <Button variant="primary" type="submit" onSubmit={handleSubmit}>
-              Submit
-            </Button>
-          </Form>
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button variant="danger" onClick={() => {deleteProduct(id); setproductDescription({id: -1})}}>Delete</Button>
-          <Button variant="primary">Save changes</Button>
-        </Modal.Footer>
-      </Modal.Dialog>
-    </div>
-  )
-}
