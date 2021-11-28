@@ -1,54 +1,43 @@
-import flask
+from flask import *
 import pyodbc
-from .DBS import cursor
+from .DBS import cursor, conn
 
-Product = flask.Blueprint('Product', __name__)
+Product = Blueprint('Product', __name__)
     
-@Product.route("/api/product/all", methods = ["GET"])
+@Product.route("/get/product", methods = ["GET"])
 def queryProducts():
-    type = flask.request.args.get("type")
-    orderBy = flask.request.args.get("orderby")
-    desc = flask.request.args.get("desc")
-    qty = flask.request.args.get("qty")
-    offset = flask.request.args.get("offset")
+    type = request.args.get("type")
+    orderBy = request.args.get("orderby")
+    desc = request.args.get("desc")
+    qty = request.args.get("qty")
+    offset = request.args.get("offset")
     
     query = "exec getProductsOfType"
     
-    if type != None:
-        query += f" @type=\'{type}\',"
-        
-    if orderBy != None:
-        query += f" @orderBy=\'{orderBy}\',"
-        
-    if desc != None:
-        query += f" @desc={desc},"
-        
-    if qty != None:
-        query += f" @qty={qty},"
-        
-    if offset != None:
-        query += f" @offset={offset}"
-
-    if query[-1] == ",":
-        query = query[:-1]
+    if type != None:        query += f" @type=\'{type}\',"
+    if orderBy != None:     query += f" @orderBy=\'{orderBy}\',"
+    if desc != None:        query += f" @desc={desc},"
+    if qty != None:         query += f" @qty={qty},"
+    if offset != None:      query += f" @offset={offset}"
+    if query[-1] == ",":    query = query[:-1]
 
     try:
         cursor.execute(query)
     except pyodbc.Error as err:
         print(err)
-        return flask.Response(err.args[1], status=400)
+        return Response(err.args[1], status=400)
         
     colNames = [column[0] for column in cursor.description]
     results = [dict(zip(colNames, row)) for row in cursor]
     
-    return flask.jsonify(results)
+    return jsonify(results)
 
-@Product.route("/api/product/info", methods = ["GET"])
+@Product.route("/get/infoproduct", methods = ["GET"])
 def queryInfo():
-    id = flask.request.args.get("id")
+    id = request.args.get("id")
     
     if id == None:
-        return flask.Response("Much provide ID!!", status=400)
+        return Response("Please provide and ID!!", status=400)
     
     query = "exec getInfoProduct @ID = ?"
     
@@ -56,10 +45,60 @@ def queryInfo():
         cursor.execute(query, id)
     except pyodbc.Error as err:
         print(err)
-        return flask.Response(err.args[1], status=400)
+        return Response(err.args[1], status=400)
     
     colNames = [column[0] for column in cursor.description]
     results = dict(zip(colNames, cursor.fetchone()))
     
-    return flask.jsonify(results)
+    return jsonify(results)
+    
+@Product.route("/edit/infoproduct", methods=["POST"])
+def editProduct():
+    query = "exec updateSanPham "
+    for k, v in request.json.items():
+        if v is None:
+            continue
+        if type(v) == str:
+            query += f"@{k}=N\'{v}\',"
+        else: 
+            query += f"@{k}={v}," 
+    query = query[:-1]
+    try:
+        cursor.execute(query)
+        conn.commit()
+    except pyodbc.ProgrammingError as e:
+        print("ERROR: " + str(e))
+        return Response(e.args[1], status=400)  #send sql error msg back to client
+    return Response("Success", status=200)
+
+@Product.route("/delete/product", methods = ["POST"])
+def deleteProduct():
+    id = request.json.get("ID")
+
+    if (id == None):
+        return Response("Please provide and ID!!", status=400)
+    try:
+        query = '''delete from SanPham where ID = ?'''
+        cursor.execute(query, id)
+        conn.commit()
+    except pyodbc.ProgrammingError as e:
+        return Response(e.args[1], status=400)  #send sql error msg back to client
+    return Response("Success", status=200)
+
+@Product.route("/add/product", methods = ["POST"])
+def addProduct():
+    query = "exec insertSanPham "
+    for k, v in request.json.items():
+        if type(v) == str:
+            query += f"@{k}=N\'{v}\',"
+        else: 
+            query += f"@{k}={v}," 
+    query = query[:-1]
+    try:
+        cursor.execute(query)
+        conn.commit()
+    except pyodbc.ProgrammingError as e:
+        print("ERROR: " + str(e))
+        return Response(e.args[1], status=400)  #send sql error msg back to client
+    return Response("Success", status=200)
     

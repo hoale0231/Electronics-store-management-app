@@ -22,7 +22,7 @@ EXEC sys.sp_addmessage
 	,@lang = 'us_english'
 go
 
--- C�u 4
+-- Cau 4
 
 create or alter function getValidSanPhamID(@ProdType nvarchar(100), @DeviceType nvarchar(100))
 returns char(9)
@@ -116,7 +116,7 @@ select ID, price, dbo.getCurrentPrice(ID) as currentPrice
 from SanPham
 where Price != dbo.getCurrentPrice(ID)
 go
--- C�u 1 
+-- Cau 1 
 create or alter procedure insertSanPham
 		-- Sanpham
 		@ID          CHAR(9)		= NULL,
@@ -214,13 +214,33 @@ begin
 	set xact_abort off;
 END;
 go
-delete from SanPham where ID = 'PKCH00001'
+
 delete from SanPham where ID = 'TBLT00007'
+select * from SanPham
 exec insertSanPham @ID = 'TBLT00007',  @ProdName = 'GIGABYTE Gaming G5',  @PriceIn = 22500000,  @Price = 28000000,  @Insurance = 12,  @Other = 'LED keyboard',  @Manufacture = 'Gigabyte',   @ProdType = 'Device', @Battery = '4-cell, 41Wh',  @DateRelease = '01-01-2021',  @Screen = '15.6", Full HD (1920 x 1080), 144Hz', @RAM = '16 GBDDR4 3200 MHz',  @DeviceType = 'Laptop',  @CPU_Chip = 'i510500H2.5GHz',  @GPU = 'RTX 3060 6GB',  @HardDisk = '512 GB SSD NVMe PCIe' 
 exec insertSanPham @ID = 'TBDT00007',  @ProdName = 'GIGABYTE Gaming G5',  @PriceIn = 22500000,  @Price = 28000000,  @Insurance = 12,  @Other = 'LED keyboard',  @Manufacture = 'Gigabyte',   @ProdType = 'Device', @Battery = '4-cell, 41Wh',  @DateRelease = '01-01-2021',  @Screen = '15.6", Full HD (1920 x 1080), 144Hz', @RAM = '16 GBDDR4 3200 MHz',  @DeviceType = 'Laptop',  @CPU_Chip = 'i510500H2.5GHz',  @GPU = 'RTX 3060 6GB',  @HardDisk = '512 GB SSD NVMe PCIe' 
 go
 
--- C�u 2
+-- Cau 2
+create or alter trigger delete_Sanpham on SanPham
+instead of delete
+as begin
+	-- Get ID of product
+	declare @ID char(9);
+	select @ID = ID from deleted;
+	-- Set available = 0
+	update SanPham set Available = 0 where ID = @ID;
+	declare @Count int;
+	-- Count orders contain this product
+	select @Count = COUNT(*) 
+	from SanPham_Thuoc_DonHang 
+	where ID_Prod = @ID;
+	-- If no order contain this order, delete it
+	if @Count = 0 
+		delete from SanPham where ID = @ID;
+end
+go
+
 create or alter trigger update_price on SanPham
 after insert, update
 as begin
@@ -298,7 +318,7 @@ as	begin
 	end;
 go
 
--- C�u 3
+-- Cau 3
 create or alter procedure getInfoProduct (@ID char(9))
 as 
 begin
@@ -331,7 +351,7 @@ exec getInfoProduct @ID = 'PKCH00001'
 go
 
 create or alter procedure getProductsOfType 
-(@Type nvarchar(100) = 'All', @DESC int = 0, @orderBy varchar(100) = NULL, @qty int = 5, @offset int = 0)
+(@Type nvarchar(100) = 'All', @DESC int = 0, @orderBy varchar(100) = NULL, @qty bigint = 5, @offset int = 0)
 as	begin
 		declare @idType char(4);	
 		set @idType = case @Type
@@ -343,11 +363,11 @@ as	begin
 						when 'OtherDevice' then 'TBKH'
 						when 'OtherAccessory' then 'PKKH'
 					  end;
-
+		if (@qty = -1) set @qty = 9223372036854775807;
 		select top (@qty) * from 
 		(select SanPham.ID as ID, ProdName, PriceIn, Price, dbo.getCurrentPrice(SanPham.ID) as CurrentPrice, Insurance, TotalQuantity 
 		from SanPham
-		where @Type = 'All' or left(SanPham.ID, 4) = @idType
+		where (@Type = 'All' or left(SanPham.ID, 4) = @idType) and Available = 1
 		order by 
 				case @DESC when 0 then
 				case @orderBy
@@ -373,7 +393,7 @@ as	begin
 end
 go
 
-exec getProductsOfType @Type = 'All'
+exec getProductsOfType @Type = 'All', @qty = -1
 exec getProductsOfType @Type = 'Mouse', @orderBy = 'CurrPrice'
 exec getProductsOfType @Type = 'Mouse', @orderBy = 'CurrPrice', @offset = 1
 exec getProductsOfType @Type = 'HeadPhone', @orderBy = 'Insurance', @qty = 2, @desc = 1
@@ -396,7 +416,7 @@ go
 
 exec getSummaryProduct @ProdType = 'Accessory'
 go
-
+		
 create or alter procedure updateSanPham
 		-- Sanpham
 		@ID          CHAR(9),
@@ -405,22 +425,28 @@ create or alter procedure updateSanPham
 		@Price       INT,
 		@Insurance   INT,
 		@Other       nvarchar(100),
-		@Manufacture nvarchar(100),
+		@Manufacture nvarchar(100) = NULL,
+		@ProdType	 nvarchar(100),
 		@Available   bit,
+		@TotalQuantity INT,
 		-- ThietBiDienTu
-		@Battery     nvarchar(100),
-		@DateRelease DATE,
-		@Screen      nvarchar(100),
-		@RAM         nvarchar(100),
-		@CPU_Chip    nvarchar(100),
-		@GPU         nvarchar(100),
-		@HardDisk    nvarchar(100),
-		@Camera		 nvarchar(100),
-		@SIM         nvarchar(100),
+		@Battery     nvarchar(100)	= NULL,
+		@DateRelease DATE			= NULL,
+		@Screen      nvarchar(100)	= NULL,
+		@RAM         nvarchar(100)	= NULL,
+		@DeviceType  nvarchar(100)	= NULL,
+		@AccsoryType nvarchar(100)	= NULL,
+		@CPU	     nvarchar(100)	= NULL,
+		@Chip		 nvarchar(100)	= NULL,
+		@GPU         nvarchar(100)	= NULL,
+		@HardDisk    nvarchar(100)	= NULL,
+		@Camera		 nvarchar(100)	= NULL,
+		@SIM         nvarchar(100)	= NULL,
+		@Indisk		 nvarchar(100)	= NULL,
 		-- PhuKien
-		@Connection	varchar(100),
-		@DPI varchar(100)		,
-		@HPhoneType varchar(100)
+		@Connection	varchar(100)	= NULL,
+		@DPI varchar(100)			= NULL,
+		@HPhoneType varchar(100)	= NULL
 as 
 begin 
     set nocount on;
@@ -428,7 +454,7 @@ begin
 	BEGIN TRANSACTION;
 		-- insert Sanpham
 		update SanPham 
-		set ProdName = @ProdName, PriceIn = @Price,  Price = @Price, Insurance = @Insurance, Other = @Other, manufacture = @Manufacture,  Available = @Available
+		set ProdName = @ProdName, PriceIn = @PriceIn,  Price = @Price, Insurance = @Insurance, Other = @Other, manufacture = @Manufacture
 		where ID = @ID;
 
 		update ThietBiDienTu
@@ -440,19 +466,19 @@ begin
 		where ID = @ID;
 
 		update Laptop
-		set GPU = @GPU, CPU = @CPU_Chip, HardDisk = @HardDisk
+		set GPU = @GPU, CPU = @CPU, HardDisk = @HardDisk
 		where ID = @ID
 
 		update DienThoai
-		set Chip = @CPU_Chip, Camera = @Camera, SIM = @SIM, InDisk = @HardDisk
+		set Chip = @Chip, Camera = @Camera, SIM = @SIM, InDisk = @Indisk
 		where ID = @ID
 
 		update MayTinhBang
-		set Chip = @CPU_Chip, Camera = @Camera, InDisk = @HardDisk
+		set Chip = @Chip, Camera = @Camera, InDisk = @Indisk
 		where ID = @ID
 
 		update Chuot
-		set DPI = @DateRelease
+		set DPI = @DPI
 		where ID = @ID
 
 		update TaiNghe

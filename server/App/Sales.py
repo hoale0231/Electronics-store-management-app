@@ -1,7 +1,7 @@
 import pyodbc
 from flask import *
 from .DBS import cursor
-
+from .DBS import conn
 Sales = Blueprint('Sales', __name__)
 
 @Sales.route("/sales-info/all", methods=["GET"])
