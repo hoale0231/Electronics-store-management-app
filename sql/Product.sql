@@ -124,8 +124,8 @@ create or alter procedure insertSanPham
 		@PriceIn     INT,
 		@Price       INT,
 		@Insurance   INT			= NULL,
-		@Other       nvarchar(100),
-		@Manufacture nvarchar(100),
+		@Other       nvarchar(100)	= NULL,
+		@Manufacture nvarchar(100)	= NULL,
 		@ProdType	 nvarchar(100),
 		@Available   bit			= 1,
 		-- ThietBiDienTu
@@ -133,7 +133,7 @@ create or alter procedure insertSanPham
 		@DateRelease DATE			= NULL,
 		@Screen      nvarchar(100)	= NULL,
 		@RAM         nvarchar(100)	= NULL,
-		@DeviceType  nvarchar(100),
+		@DeviceType  nvarchar(100)  = 'Other',
 		@CPU_Chip    nvarchar(100)	= NULL,
 		@GPU         nvarchar(100)	= NULL,
 		@HardDisk    nvarchar(100)	= NULL,
@@ -371,7 +371,6 @@ as	begin
 		order by 
 				case @DESC when 0 then
 				case @orderBy
-					when 'ProdName' then ProdName
 					when 'Price' then Price
 					when 'PriceIn' then PriceIn
 					when 'CurrPrice' then dbo.getCurrentPrice(SanPham.ID)
@@ -381,7 +380,6 @@ as	begin
 				end end asc,
 				case @DESC when 1 then
 				case @orderBy
-					when 'ProdName' then ProdName
 					when 'Price' then Price
 					when 'PriceIn' then PriceIn
 					when 'CurrPrice' then dbo.getCurrentPrice(SanPham.ID)

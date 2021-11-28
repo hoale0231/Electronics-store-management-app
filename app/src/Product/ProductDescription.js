@@ -4,12 +4,13 @@ import "./ProductDescription.css"
 
 export default function ProductDescription(props) {
   const {id, setproductDescription, deleteProduct, action} = props
-  const [info, setInfo] = useState({})
+  const [info, setInfo] = useState({ProdType: "Device"})
   const [prodType, setProdType] = useState('Device')
-  const [deviceType, setDeviceType] = useState('Other')
 
   useEffect(() => {
-    if (action !== "Edit") return;
+    if (action !== "Edit") {  
+      return;
+    } 
     fetch("/get/infoproduct?id="+id)
     .then((response) => {
       if (response.ok) {
@@ -17,7 +18,7 @@ export default function ProductDescription(props) {
       } 
       throw response
     })
-    .then((data) => {setInfo(data); setProdType(data.prodType)})
+    .then((data) => {setInfo(data); setProdType(data.ProdType); console.log(data)})
     .catch((error) => {
       console.error("Error fetching data: ", error);
     })
@@ -30,8 +31,9 @@ export default function ProductDescription(props) {
     setValidated(true);
     if (form.checkValidity() === false) {
       event.stopPropagation();
+      event.preventDefault();
     } else {
-      // query = ""
+      var query = action === "Edit" ? "/edit/infoproduct" : "/add/product"
       const product = {}
       Object.keys(info).forEach( k => {product[k] = info[k]})
       const requestOptions = {
@@ -39,10 +41,19 @@ export default function ProductDescription(props) {
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(info)
       };
-      fetch('/edit/infoproduct', requestOptions) 
+      fetch(query, requestOptions)
+      .then(response => {
+        if (response.ok) {
+          setproductDescription(-1)
+        } else {
+          response.text().then(text => { alert(text) })
+          event.stopPropagation();
+        }
+      }) 
     }
-    setproductDescription(-1)
-    event.preventDefault();
+    if (action === "Edit") {
+      event.preventDefault();
+    }
   };
 
   const handleInputChange = (event) => {
@@ -50,8 +61,7 @@ export default function ProductDescription(props) {
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
     info[name] = value;
-    if (name === "ProdType") setProdType(target.value)
-    else if (name === "DeviceType" || name === "AccsoryType") setDeviceType(target.value)
+    if (name === "ProdType") setProdType(value)
   }
 
   return(
@@ -66,7 +76,7 @@ export default function ProductDescription(props) {
             <Row className="mb-3">
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID" attrName="ID" md="4" disable={action === 'Edit'}/>
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ProdName" attrName="Product Name" required={true} md="4"/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="manufacture" attrName="Brand" required={true} md="4"/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="manufacture" attrName="Brand" md="4"/>
             </Row>
             <Row className="mb-3">
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="PriceIn" attrName="Import Price" required={true} md="4"/>
@@ -102,6 +112,15 @@ export default function ProductDescription(props) {
 
 function Device(props) {
   const {info, handleInputChange, action} = props
+  const [deviceType, setDeviceType] = useState('Other')
+
+  const handleDeviceTypeChange = function(event) {
+    const target = event.target;
+    setDeviceType(target.value)
+  }
+
+  useEffect(() => setDeviceType(info.DeviceType), [info])
+
   return (
     <div>
       <Row className="mb-3">
@@ -113,7 +132,7 @@ function Device(props) {
         <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="DateRelease" attrName="Date Release" md="4"/>
         <Form.Group as={Col} md={4}>
           <Form.Label>Device</Form.Label>
-          <Form.Select defaultValue={info.DeviceType} name="DeviceType" onChange={handleInputChange} disabled={action === 'Edit'}>
+          <Form.Select defaultValue={deviceType} name="DeviceType" onChange={handleDeviceTypeChange} disabled={action === 'Edit'}>
             <option value="Laptop">Laptop</option>
             <option value="Phone">Phone</option>
             <option value="Tablet">Tablet</option>
@@ -121,30 +140,39 @@ function Device(props) {
           </Form.Select>
         </Form.Group>
       </Row>
-      {info.DeviceType === "Laptop" ? <Laptop info={info} handleInputChange={handleInputChange}/> : 
-      info.DeviceType === "Phone" ? <Phone info={info} handleInputChange={handleInputChange}/> : 
-      info.DeviceType === "Tablet" ? <Tablet info={info} handleInputChange={handleInputChange}/> : <div/>}
+      {deviceType === "Laptop" ? <Laptop info={info} handleInputChange={handleInputChange}/> : 
+      deviceType === "Phone" ? <Phone info={info} handleInputChange={handleInputChange}/> : 
+      deviceType === "Tablet" ? <Tablet info={info} handleInputChange={handleInputChange}/> : <div/>}
     </div>
   )
 }
 
 function Accessory(props) {
   const {info, handleInputChange, action} = props
+  const [deviceType, setDeviceType] = useState('Other')
+
+  const handleDeviceTypeChange = function(event) {
+    const target = event.target;
+    setDeviceType(target.value)
+  }
+
+  useEffect(() => setDeviceType(info.AccsoryType), [info])
+
   return (
     <div>
       <Row className="mb-3">
         <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Connection" attrName="Connection" md="4"/>
         <Form.Group as={Col} md={4}>
           <Form.Label>Device</Form.Label>
-          <Form.Select defaultValue={info.AccsoryType} name="AccsoryType" onChange={handleInputChange} disabled={action === 'Edit'}>
+          <Form.Select defaultValue={deviceType} name="AccsoryType" onChange={handleDeviceTypeChange} disabled={action === 'Edit'}>
             <option value="Mouse">Mouse</option>
-            <option value="HeadPhone">HeadPhone</option>
+            <option value="Headphone">HeadPhone</option>
             <option value="Other">Other</option>
           </Form.Select>
         </Form.Group>
       </Row>
-      {info.AccsoryType === "Mouse" ? <Mouse info={info} handleInputChange={handleInputChange}/> : 
-      info.AccsoryType === "HeadPhone" ? <HeadPhone info={info} handleInputChange={handleInputChange}/> : <div/>}
+      {deviceType === "Mouse" ? <Mouse info={info} handleInputChange={handleInputChange}/> : 
+      deviceType === "Headphone" ? <HeadPhone info={info} handleInputChange={handleInputChange}/> : <div/>}
     </div>
   )
 }
