@@ -144,12 +144,12 @@ create or alter procedure getSalesByProduct
 as
 	begin
 		SET NOCOUNT ON;
-		select ID_Prod, ProdName, ID_Ad, TimeStart, TimeEnd, PromoLevel
+		select CTKM_SanPham.ID, TimeStart, TimeEnd, PromoLevel, SanPham.ID as ProdID, ProdName, SanPham.manufacture
 		from CTKM_SanPham, SanPham_ApDung_CTKM, SanPham
 		where SanPham_ApDung_CTKM.ID_Prod = @Id_Prod and
 			  SanPham_ApDung_CTKM.ID_Ad = CTKM_SanPham.ID and
-			  CTKM_SanPham.TimeStart >= @StartTime and
-			  CTKM_SanPham.TimeStart <= @EndTime and 
+			  @StartTime >= CTKM_SanPham.TimeStart and
+			  @StartTime <= CTKM_SanPham.TimeEnd and 
 			  SanPham.ID = @Id_Prod
 		order by TimeStart
 		SET NOCOUNT OFF;
@@ -165,13 +165,13 @@ create or alter procedure getTopDealsOfBrand
 as
 begin
 	SET NOCOUNT ON;
-	select MaxDeal.manufacture, SanPham.ID as ID_Prod, ProdName, TimeStart, TimeEnd, PromoLevel
+	select CTKM_SanPham.ID, TimeStart, TimeEnd, PromoLevel, SanPham.ID as ProdID, ProdName, SanPham.manufacture
 	from (select manufacture, MAX(CTKM_SanPham.PromoLevel) as maxRate
 			from SanPham, CTKM_SanPham, SanPham_ApDung_CTKM
 			where SanPham.ID = SanPham_ApDung_CTKM.ID_Prod 
-					and SanPham_ApDung_CTKM.ID_Ad = CTKM_SanPham.ID
-					and @StartTime <= CTKM_SanPham.TimeStart
-					and CTKM_SanPham.TimeStart <= @EndTime
+					and SanPham_ApDung_CTKM.ID_Ad = CTKM_SanPham.ID and
+					@StartTime >= CTKM_SanPham.TimeStart and
+					@StartTime <= CTKM_SanPham.TimeEnd 
 			group by manufacture
 			having manufacture = @brand) as MaxDeal, SanPham, SanPham_ApDung_CTKM, CTKM_SanPham
 	where SanPham.ID = SanPham_ApDung_CTKM.ID_Prod and
