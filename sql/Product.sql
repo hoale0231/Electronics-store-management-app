@@ -421,12 +421,12 @@ create or alter procedure updateSanPham
 		@ProdName    nvarchar(100),
 		@PriceIn     INT,
 		@Price       INT,
-		@Insurance   INT,
-		@Other       nvarchar(100),
-		@Manufacture nvarchar(100) = NULL,
+		@Insurance   INT			= NULL,
+		@Other       nvarchar(100)	= NULL,
+		@Manufacture nvarchar(100)	= NULL,
 		@ProdType	 nvarchar(100),
-		@Available   bit,
-		@TotalQuantity INT,
+		@Available   bit			= NULL,
+		@TotalQuantity INT		    = NULL,
 		-- ThietBiDienTu
 		@Battery     nvarchar(100)	= NULL,
 		@DateRelease DATE			= NULL,
@@ -489,3 +489,19 @@ begin
 END;
 go
 
+create or alter trigger deleteDonHang on SanPham_Thuoc_DonHang
+after delete
+as	begin
+	set nocount on;
+	set xact_abort on;
+	BEGIN TRANSACTION;
+		declare @ID_Prod char(9);
+		select @ID_Prod = ID_Prod from deleted
+
+		delete from SanPham
+		where ID = @ID_Prod and Available = 0
+	commit TRANSACTION;
+	set nocount off;
+	set xact_abort off;
+	end;
+go

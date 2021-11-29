@@ -4,17 +4,19 @@ import { useState, useEffect } from "react";
 import ProductDescription from "./ProductDescription";
 import 'react-bootstrap-table2-filter/dist/react-bootstrap-table2-filter.min.css';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import SummaryChart from "./chart";
 
 var offset = 0;
 var filter = 'All'
 var sortBy = 'ID'
 var desc = 0
-var condition = 'none'
 
 export default function Product() {
   const [productDescription, setproductDescription] = useState(-1)
   const [products, setProducts] = useState([]);
-  
+  const [categories, setCategories] = useState([])
+  const [series, setSeries] = useState([])
+
   const columns = [
     { dataField: "ID",            text: "Product ID",     filter: textFilter() }, 
     { dataField: "ProdName",      text: "Product Name",   filter: textFilter() }, 
@@ -24,7 +26,39 @@ export default function Product() {
     { dataField: "TotalQuantity", text: "Total Quantity", filter: textFilter() }
   ];
 
+  
   useEffect(() => {
+    const getSummaryData = function() {
+      fetch('/get/SummaryProduct')
+      .then((response) => {
+          if(response.ok) {
+              return response.json()
+          }
+          throw response
+      })
+      .then((data) => {
+          data.forEach(element => {
+              var indexCategories = categories.findIndex(e => e === element["BranchName"])
+              if (indexCategories === -1) {
+                  categories.push(element["BranchName"])
+                  indexCategories = categories.length - 1
+              }
+              var indexSeries = series.findIndex(e => e.name === element["DeviceType"])
+              if (indexSeries === -1) {
+                  series.push({name: element["DeviceType"], data: new Array(categories.length).fill(0)})
+                  indexSeries = series.length - 1
+              }
+              const data = series[indexCategories].data
+              while (indexCategories >= data.length) {
+                  data.push(0)
+              }
+              series[indexSeries].data[indexCategories] = element["TotalProduct"]
+          }); 
+          setCategories(categories)
+          setSeries(series)
+        })
+    }
+    // Get Products Data
     fetch("/get/product")
     .then((response) => {
       if (response.ok) {
@@ -33,11 +67,13 @@ export default function Product() {
         response.text().then(text => { alert(text) })
       }
     })
-    .then((data) => {setProducts(data);})
+    .then((data) => {setProducts(data); getSummaryData()})
     .catch((error) => {
       console.error("Error detect: ", error);
-    })
-  }, [])
+    }) 
+    // Get Summary Data
+    
+  }, [categories, series])
 
   const deleteProduct = function(id) {
     const requestOptions = {
@@ -99,11 +135,6 @@ export default function Product() {
     loadData(true)
   }
 
-  const handleChangeCondition = function(event) {
-    condition = event.target.value
-    loadData(true)
-  }
-
   function selectGroup() {
     return (
       <div>
@@ -142,31 +173,20 @@ export default function Product() {
               </Form.Select>
             </FloatingLabel>
           </Col>
-          <Col md>
-            <FloatingLabel label="Filter by condition">
-              <Form.Select onChange={handleChangeCondition}>
-                <option value="none">All</option>
-                <option value="max">Max of brands</option>
-                <option value="min">Min of brands</option>
-              </Form.Select>
-            </FloatingLabel>
-          </Col>
         </Row>
-        <Row className="g-2">
-          <Col md>
-            <Button variant="success" onClick={() => {setproductDescription(0)}}>Add product</Button>
-          </Col>
-        </Row>
-        {/* <Button variant="success" className="loadButton" onClick={() =>{loadData(true)}}>Load</Button> */}
       </div>
     )
   }
 
   return (
     <div className="popup_container">
+      <h1>Product summary</h1>
+      <SummaryChart categories={categories} series={series}/>
+      <h1>Product Table</h1>
       <div>
         {selectGroup()}
       </div>
+      <Button className="customButton" variant="success" onClick={() => {setproductDescription(0)}}>Add product</Button>
       <div className="table-custom">
          {/* https://react-bootstrap-table.github.io/react-bootstrap-table2/docs/about.html  */}
         <BootstrapTable keyField="id" data={products} columns={columns} rowEvents={rowEvents} filter={filterFactory()}/>

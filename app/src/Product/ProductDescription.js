@@ -2,6 +2,8 @@ import {Modal, Button, Form, Row, Col} from 'react-bootstrap'
 import { useState, useEffect } from "react";
 import "./ProductDescription.css"
 
+var number = /^-?\d+$/;
+
 export default function ProductDescription(props) {
   const {id, setproductDescription, deleteProduct, action} = props
   const [info, setInfo] = useState({ProdType: "Device"})
@@ -18,7 +20,7 @@ export default function ProductDescription(props) {
       } 
       throw response
     })
-    .then((data) => {setInfo(data); setProdType(data.ProdType); console.log(data)})
+    .then((data) => {setInfo(data); setProdType(data.ProdType)})
     .catch((error) => {
       console.error("Error fetching data: ", error);
     })
@@ -28,6 +30,26 @@ export default function ProductDescription(props) {
 
   const handleSubmit = (event) => {
     const form = event.currentTarget;
+
+    if (!number.test(form.Price.value)) {
+      alert("Default price much be number!")
+      event.stopPropagation();
+      event.preventDefault();
+      return
+    }
+    if (!number.test(form.PriceIn.value)) {
+      alert("Imort price much be number!")
+      event.stopPropagation();
+      event.preventDefault();
+      return
+    }
+    if (!number.test(form.Insurance.value) && form.Insurance.value !== "") {
+      alert("Insurance much be number!")
+      event.stopPropagation();
+      event.preventDefault();
+      return
+    }
+
     setValidated(true);
     if (form.checkValidity() === false) {
       event.stopPropagation();
@@ -46,14 +68,11 @@ export default function ProductDescription(props) {
         if (response.ok) {
           setproductDescription(-1)
         } else {
-          response.text().then(text => { alert(text) })
-          event.stopPropagation();
+          response.text().then(text => { alert(text);})
         }
       }) 
     }
-    if (action === "Edit") {
-      event.preventDefault();
-    }
+    event.preventDefault();
   };
 
   const handleInputChange = (event) => {
@@ -84,7 +103,7 @@ export default function ProductDescription(props) {
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Insurance" attrName="Insurance" md="4"/>
             </Row>
             <Row className="mb-3">
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="TotalQuantity" attrName="Total Quantity" md="4" disable={action === 'Edit'}/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="TotalQuantity" attrName="Total Quantity" md="4" disable={true}/>
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Other" attrName="Other" md="4"/>
               <Form.Group as={Col} md={4}>
                 <Form.Label>Product Type</Form.Label>
