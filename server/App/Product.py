@@ -1,6 +1,6 @@
 from flask import *
 import pyodbc
-from .DBS import cursor, conn
+from .DBS import connect
 
 Product = Blueprint('Product', __name__)
     
@@ -22,6 +22,8 @@ def queryProducts():
     if query[-1] == ",":    query = query[:-1]
 
     try:
+        conn = pyodbc.connect(connect)
+        cursor = conn.cursor()
         cursor.execute(query)
     except pyodbc.Error as err:
         print(err)
@@ -42,6 +44,8 @@ def queryInfo():
     query = "exec getInfoProduct @ID = ?"
     
     try:
+        conn = pyodbc.connect(connect)
+        cursor = conn.cursor()
         cursor.execute(query, id)
     except pyodbc.Error as err:
         print(err)
@@ -64,6 +68,8 @@ def editProduct():
             query += f"@{k}={v}," 
     query = query[:-1]
     try:
+        conn = pyodbc.connect(connect)
+        cursor = conn.cursor()
         cursor.execute(query)
         conn.commit()
     except pyodbc.ProgrammingError as e:
@@ -79,6 +85,8 @@ def deleteProduct():
         return Response("Please provide and ID!!", status=400)
     try:
         query = '''delete from SanPham where ID = ?'''
+        conn = pyodbc.connect(connect)
+        cursor = conn.cursor()
         cursor.execute(query, id)
         conn.commit()
     except pyodbc.ProgrammingError as e:
@@ -95,6 +103,8 @@ def addProduct():
             query += f"@{k}={v}," 
     query = query[:-1]
     try:
+        conn = pyodbc.connect(connect)
+        cursor = conn.cursor()
         cursor.execute(query)
         conn.commit()
     except pyodbc.ProgrammingError as e:
@@ -109,6 +119,8 @@ def getSummaryProduct():
     query = "exec getSummaryProduct @ProdType = ?"
     
     try:
+        conn = pyodbc.connect(connect)
+        cursor = conn.cursor()
         cursor.execute(query, ProdType)
     except pyodbc.Error as err:
         print(err)
