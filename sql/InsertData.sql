@@ -315,7 +315,8 @@ insert into ChiNhanh_Ban_SanPham (ID_Prod, ID_Branch, Quantity) values
 ('TBLT00001', '3', 10), ('TBLT00002', '3', 50), ('TBLT00007', '3', 30), ('TBLT00004', '3', 33), ('TBLT00005', '3', 90),
 ('TBDT00001', '3', 30), ('TBDT00002', '3', 40), ('TBDT00003', '3', 35), ('TBDT00004', '3', 46), ('TBDT00005', '3', 30), 
 ('TBMB00001', '3', 20), ('TBMB00002', '3', 50), ('TBMB00003', '3', 30), ('TBMB00004', '3', 33), 
-('PKCH00001', '3', 30), ('PKCH00002', '3', 40), ('PKCH00003', '3', 35), ('PKCH00004', '3', 46), ('PKCH00005', '3', 200), ('PKCH00006', '3', 200), ('PKCH00007', '3', 200), ('PKCH00008', '3', 200), ('PKCH00009', '3', 200);
+('PKCH00001', '3', 30), ('PKCH00002', '3', 40), ('PKCH00003', '3', 35), ('PKCH00004', '3', 46), ('PKCH00005', '3', 90), ('PKCH00006', '3', 80), ('PKCH00007', '3', 60), ('PKCH00008', '3', 30), ('PKCH00009', '3', 20);
+('PKTN00001', '2', 15), ('PKTN00002', '2', 30), ('PKTN00003', '2', 75), ('PKTN00004', '2', 26), ('PKTN00005', '2', 23), ('PKTN00006', '2', 20), ('PKTN00007', '2', 44), ('PKTN00008', '2', 55), ('PKTN00009', '2', 10)
 
 -- Insert Khach hang
 insert into KhachHang (ID, Username, Passwd, Phone, Fname, Lname, Email, Bdate, IdNum, FamScore) values
@@ -364,7 +365,7 @@ go
  
 alter table SanPham_Thuoc_DonHang
 add foreign key (ID_Prod) references SanPham(ID),
-	foreign key (ID_Order) references DonHang(ID);
+	foreign key (ID_Order) references DonHang(ID) on update cascade on delete cascade;
 go
  
 alter table NguoiThan

@@ -102,3 +102,19 @@ def addProduct():
         return Response(e.args[1], status=400)  #send sql error msg back to client
     return Response("Success", status=200)
     
+@Product.route("/get/SummaryProduct", methods = ["GET"])
+def getSummaryProduct():
+    ProdType = request.args.get("ProdType")
+    
+    query = "exec getSummaryProduct @ProdType = ?"
+    
+    try:
+        cursor.execute(query, ProdType)
+    except pyodbc.Error as err:
+        print(err)
+        return Response(err.args[1], status=400)
+    
+    colNames = [column[0] for column in cursor.description]
+    results = [dict(zip(colNames, row)) for row in cursor]
+    
+    return jsonify(results)
