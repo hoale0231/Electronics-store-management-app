@@ -44,9 +44,8 @@ as
 		set nocount on;
 		if cast((select salary from inserted) as int) > cast((select salary from deleted) as int )* 1.2
 		begin 
-			COMMIT TRANSACTION;
 				RAISERROR (15600,-1,-1, N'lương mới không được lớn hơn 20% so với luơng củ');  
-			ROLLBACK TRANSACTION;
+			ROLLBACK;
 		end 
 		set nocount off;
 	end
@@ -54,7 +53,7 @@ as
 go
 
 update NhanVien
-set Salary = 25000000
+set Salary = 18000000
 where ID = 1
 
 update NhanVien

@@ -62,7 +62,7 @@ export default function StaffDescription(props) {
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
     info[name] = value;
-    if (name === "ProdType") setProdType(value)
+    // if (name === "ProdType") setProdType(value)
   }
 
 
