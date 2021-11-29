@@ -67,6 +67,22 @@ def getAllProductsOfSales():
     colNames = [column[0] for column in cursor.description]
     results = [dict(zip(colNames, row)) for row in records]
     return jsonify(results)
+    
+@Sales.route("/get/applied-products/", methods=["GET"])
+def getProductsOfSalesbyDate():
+    startDate = request.args.get("startDate")
+    endDate = request.args.get("endDate")
+    query = '''select CTKM_SanPham.ID, TimeStart, TimeEnd, PromoLevel, SanPham.ID as ProdID, ProdName, SanPham.manufacture
+                from CTKM_SanPham, SanPham, SanPham_ApDung_CTKM
+                where CTKM_SanPham.ID = SanPham_ApDung_CTKM.ID_Ad and
+                SanPham.ID = SanPham_ApDung_CTKM.ID_Prod
+                and TimeStart <= ? and ? <= TimeEnd order by TimeStart'''
+    
+    cursor.execute(query, startDate, startDate)
+    records = cursor.fetchall()
+    colNames = [column[0] for column in cursor.description]
+    results = [dict(zip(colNames, row)) for row in records]
+    return jsonify(results)
 
 @Sales.route("/add/sales", methods=["POST"])
 def addSales():
