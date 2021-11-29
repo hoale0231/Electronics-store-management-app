@@ -1,6 +1,6 @@
 import pyodbc
 from flask import *
-from .DBS import cursor
+from .DBS import cursor, conn
 from .DBS import conn
 Sales = Blueprint('Sales', __name__)
 
@@ -87,10 +87,10 @@ def addSales():
         return Response(e.args[1], status=400)  #send sql error msg back to client
     return Response("Success", status=200)
 
-@Sales.route("/apply/product", methods=["POST"])
+@Sales.route("/apply/product", methods=["GET"])
 def applySalesToProduct():
-    salesId = request.form.get("salesId")
-    productId = request.form.get("productId")
+    salesId = request.args.get("salesId")
+    productId = request.args.get("productId")
     if (salesId == None):
         return Response("Please provide sales ID", status=400)
     elif (productId == None):
@@ -104,10 +104,10 @@ def applySalesToProduct():
         return Response(e.args[1], status=400)
     return Response("Success", status=200)
 
-@Sales.route("/apply/brand", methods=["POST"])
+@Sales.route("/apply/brand", methods=["GET"])
 def applySalesToBrand():
-    salesId = request.form.get("salesId")
-    brandName = request.form.get("brandName")
+    salesId = request.args.get("salesId")
+    brandName = request.args.get("brandName")
     if (salesId == None):
         return Response("Please provide sales ID", status=400)
     elif (brandName == None):
@@ -121,12 +121,12 @@ def applySalesToBrand():
         return Response(e.args[1], status=400)
     return Response("Success", status=200)
 
-@Sales.route("/update/sales", methods=["POST"])
+@Sales.route("/update/sales", methods=["GET"])
 def updateSales():
-    id = request.form.get("id")
-    startDate = request.form.get("startDate")
-    endDate = request.form.get("endDate")
-    rate = request.form.get("rate")
+    id = request.args.get("id")
+    startDate = request.args.get("startDate")
+    endDate = request.args.get("endDate")
+    rate = request.args.get("rate")
 
     if (id == None or startDate == None or endDate == None or rate == None):
         return Response("Not enough information", status=400)

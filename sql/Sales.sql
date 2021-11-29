@@ -39,7 +39,7 @@ begin
 	from SanPham, inserted, CTKM_SanPham
 	where SanPham.Id = inserted.ID_Prod and CTKM_SanPham.Id = inserted.ID_Ad
 
-	if (EXISTS(select * from #PriceCheck where PriceIn * 80 / 100 > Price * (100 - PromoLevel) / 100))
+	if (EXISTS(select * from #PriceCheck where PriceIn * 0.8 > Price * (1 - (PromoLevel / 100.0))))
 	begin
 		RAISERROR ('Invalid discount. Price after discount has to be larger than 80% of import price.', 16, 1);
 		rollback TRANSACTION;
@@ -106,7 +106,7 @@ begin
 	into #PriceInvalidItem
 	from SanPham, inserted, SanPham_ApDung_CTKM
 	where SanPham.Id = SanPham_ApDung_CTKM.ID_Prod and SanPham_ApDung_CTKM.ID_Ad = inserted.ID
-			and PriceIn * 80 / 100 > Price * (100 - PromoLevel) / 100
+			and PriceIn * 0.8 > Price * (1 - (PromoLevel / 100.0))
 	
 	delete from SanPham_ApDung_CTKM
 	where ID_Prod in (select ID_Prod from #PriceInvalidItem)
@@ -277,3 +277,5 @@ begin
 	return
 end
 go
+
+applySalesForBrand 'KMSP00006', 'Apple'
