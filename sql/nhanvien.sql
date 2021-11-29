@@ -53,7 +53,7 @@ as
 go
 
 update NhanVien
-set Salary = 18000000
+set Salary = 19000000
 where ID = 1
 
 update NhanVien
