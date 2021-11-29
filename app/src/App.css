@@ -33,3 +33,7 @@
 .loadButton {
   margin-top: 10px;
 }
+
+.sr-only {
+  display: none;
+}

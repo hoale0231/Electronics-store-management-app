@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import Product from './Product/Product'
-import Dung from "./Dung/Dung";
+import Sales from './Sales/Sales'
 import Toai from "./Toai/Toai";
 import Tuan from "./Tuan/Tuan";
 import Tu from "./Tu/Tu";
@@ -36,7 +36,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/Product" element={<Product/>}/>
-          <Route path="/Dung" element={<Dung/>}/>
+          <Route path="/Dung" element={<Sales/>}/>
           <Route path="/Toai" element={<Toai/>}/>
           <Route path="/Tuan" element={<Tuan/>}/>
           <Route path="/Tuan" element={<Tu/>}/>
