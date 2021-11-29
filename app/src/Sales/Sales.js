@@ -115,8 +115,21 @@ export default function Sales() {
       console.error("Error fetching data: ", error);
     })
     }
-    else{loadSalesAll();}
-    
+    else{
+    	fetch("/api/sales/get/applied-products/?startDate=" + startDate.yyyymmdd() + "&endDate=" + endDate.yyyymmdd())
+    .then((response) => {
+      if (response.ok) {
+        return response.json()
+      } 
+      throw response
+    })
+    .then((data) => {
+      setProducts(data);
+    })
+    .catch((error) => {
+      console.error("Error fetching data: ", error);
+    })
+    }
   }
   
   const handleChangeText = function(event)
