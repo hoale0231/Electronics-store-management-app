@@ -21,7 +21,6 @@ export default class Product extends Component {
       series: []
     }
     
-    this.getSummaryData("All")
     this.getProductData(true)
     this.handleChangeFilter = this.handleChangeFilter.bind(this)
     this.handleChangeSummary = this.handleChangeSummary.bind(this)
@@ -77,6 +76,9 @@ export default class Product extends Component {
     })
     .then((data) => {
       this.setState({products: reset ? data : this.state.products.concat(data)})
+      if (reset) {
+        this.getSummaryData("All")
+      }
     })
     .catch((error) => {
       console.error("Error fetching data: ", error);

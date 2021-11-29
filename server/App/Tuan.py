@@ -1,4 +1,4 @@
 import flask
-# from .DBS import cursor
+from .DBS import cursor
 
 Tuan = flask.Blueprint('Tuan', __name__)
