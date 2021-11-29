@@ -144,13 +144,35 @@ function ProductDescription(props) {
   var applyInfo = "";  
   
   const handleSubmit = (event) => {
-     if (editStartDate > editEndDate) {alert("Start date must come before end date"); return;};
-     if (discountRate <= 0 || discountRate >= 100) {alert("Discount rate must be between 0 and 100"); return;};
+     if (editStartDate > editEndDate) {
+     alert("Start date must come before end date");       
+     event.stopPropagation();
+     event.preventDefault(); 
+     return;
+     }
+     
+     if (discountRate <= 0 || discountRate >= 100) {
+     alert("Discount rate must be between 0 and 100"); 
+     event.stopPropagation();
+     event.preventDefault();
+     return;
+     }
   
       var query = "/api/sales/update/sales";
       fetch(query + "?id=" + ID + "&startDate=" + editStartDate.yyyymmdd() + "&endDate=" + editEndDate.yyyymmdd() + "&rate=" + discountRate)
       .then(response => {
         if (response.ok) {
+          if (applyInfo !== "")
+          {
+          	console.log(applyInfo)
+          	var applyQuery = applyType === "Product" ? "/api/sales/apply/product?productId=" : "/api/sales/apply/brand?brandName=";
+          	fetch(applyQuery + applyInfo + "&salesId=" + ID)
+      		.then(responseApply => {
+        	if (!response.ok) {
+          		responseApply.text().then(text => { alert(text);})
+        	   }
+      		}) 
+          }
           reload();
           setSalesDescription({id: -1});
         } else {
