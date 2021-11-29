@@ -1,4 +1,5 @@
-﻿go
+﻿use db_a2
+go
 create or alter procedure applySalesForBrand 
 		@salesID	char(9),
 		@brandName	nvarchar(100)

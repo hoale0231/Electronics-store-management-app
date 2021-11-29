@@ -398,18 +398,18 @@ exec getProductsOfType @Type = 'HeadPhone', @orderBy = 'Insurance', @qty = 2, @d
 exec getProductsOfType @Type = 'HeadPhone', @orderBy = 'Insurance', @qty = 2, @offset = 4, @desc = 1
 go
 
-create or alter procedure getSummaryProduct (@ProdType nvarchar(100) = NULL) as
+create or alter procedure getSummaryProduct (@ProdType nvarchar(100) = 'All') as
 	select BranchName, DeviceType, SUM(Quantity) as TotalProduct
 	from ChiNhanh_Ban_SanPham, SanPham, ChiNhanh, ThietBiDienTu
 	where ChiNhanh.ID = ID_Branch and SanPham.ID = ID_Prod  and (ThietBiDienTu.ID = ID_Prod)
 	group by ID_Branch, BranchName, ProdType, DeviceType
-	having DeviceType = @ProdType or ProdType = @ProdType or @ProdType is NULL
+	having DeviceType = @ProdType or ProdType = @ProdType or @ProdType = 'All'
 	union
 	select BranchName, AccsoryType as DeviceType, SUM(Quantity) as TotalProduct
 	from ChiNhanh_Ban_SanPham, SanPham, ChiNhanh, PhuKien
 	where ChiNhanh.ID = ID_Branch and SanPham.ID = ID_Prod  and (PhuKien.ID = ID_Prod)
 	group by ID_Branch, BranchName, ProdType, AccsoryType
-	having AccsoryType = @ProdType or ProdType = @ProdType or @ProdType is NULL
+	having AccsoryType = @ProdType or ProdType = @ProdType or @ProdType = 'All'
 go
 
 exec getSummaryProduct @ProdType = 'Accessory'

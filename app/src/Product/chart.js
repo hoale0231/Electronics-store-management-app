@@ -1,7 +1,7 @@
 import Chart from "react-apexcharts";
 
 export default function ApexChart(props) {
-
+    
     const series = props.series
     const options = {
         chart: {
