@@ -17,8 +17,9 @@ export default function ProductDescription(props) {
     .then((response) => {
       if (response.ok) {
         return response.json()
-      } 
-      throw response
+      } else {
+        response.text().then(text => { alert(text);})
+      }
     })
     .then((data) => {setInfo(data); setProdType(data.ProdType)})
     .catch((error) => {
@@ -57,11 +58,11 @@ export default function ProductDescription(props) {
     } else {
       var query = action === "Edit" ? "/edit/infoproduct" : "/add/product"
       const product = {}
-      Object.keys(info).forEach( k => {product[k] = info[k]})
+      Object.keys(info).forEach( k => {if (info[k] !== "") product[k] = info[k];})
       const requestOptions = {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(info)
+        body: JSON.stringify(product)
       };
       fetch(query, requestOptions)
       .then(response => {
@@ -72,7 +73,6 @@ export default function ProductDescription(props) {
         }
       }) 
     }
-    event.preventDefault();
   };
 
   const handleInputChange = (event) => {
@@ -103,6 +103,11 @@ export default function ProductDescription(props) {
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Insurance" attrName="Insurance" md="4"/>
             </Row>
             <Row className="mb-3">
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="1        " attrName="Quantity - Mộ Đức" required={true} md="4"/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="2        " attrName="Quantity - TP Quảng Ngãi" required={true} md="4"/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="3        " attrName="Quantity - Đức Phổ" md="4" required={true}/>
+            </Row>
+            <Row className="mb-3">
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="TotalQuantity" attrName="Total Quantity" md="4" disable={true}/>
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Other" attrName="Other" md="4"/>
               <Form.Group as={Col} md={4}>
@@ -114,12 +119,10 @@ export default function ProductDescription(props) {
               </Form.Group>  
             </Row>
             {prodType === "Device" ? <Device info={info} handleInputChange={handleInputChange} action={action}/> : <Accessory info={info} handleInputChange={handleInputChange} action={action}/>}
-            {/* <Form.Group className="mb-3" md="1">
-                <Form.Check label="Available" defaultChecked={info.Available}/>
-            </Form.Group> */}
+
             <Modal.Footer>
               <Button type="submit">Save Changes</Button>
-              <Button variant="danger" onClick={() => {deleteProduct(id);}}>Delete Product</Button>
+              {action === "Edit" ? <Button variant="danger" onClick={() => {deleteProduct(id);}}>Delete Product</Button> : <p/>}
             </Modal.Footer>
           </Form>
         </Modal.Body>
@@ -134,6 +137,7 @@ function Device(props) {
   const [deviceType, setDeviceType] = useState('Other')
 
   const handleDeviceTypeChange = function(event) {
+    handleInputChange(event)
     const target = event.target;
     setDeviceType(target.value)
   }
@@ -171,6 +175,7 @@ function Accessory(props) {
   const [deviceType, setDeviceType] = useState('Other')
 
   const handleDeviceTypeChange = function(event) {
+    handleInputChange(event)
     const target = event.target;
     setDeviceType(target.value)
   }

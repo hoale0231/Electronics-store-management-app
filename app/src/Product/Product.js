@@ -27,6 +27,7 @@ export default class Product extends Component {
     this.handleChangeSort = this.handleChangeSort.bind(this)
     this.handleChangeSortBy = this.handleChangeSortBy.bind(this)
     this.setproductDescription = this.setproductDescription.bind(this)
+    this.deleteProduct = this.deleteProduct.bind(this)
   }
 
   getSummaryData(ProdType) {
@@ -34,11 +35,11 @@ export default class Product extends Component {
     .then((response) => {
         if(response.ok) {
             return response.json()
+        } else {
+          response.text().then(text => { alert(text);})
         }
-        throw response
     })
     .then((data) => {
-      console.log(data)
       var categories = []
       var series = []
       data.forEach(element => {
@@ -71,14 +72,13 @@ export default class Product extends Component {
     .then((response) => {
       if (response.ok) {
         return response.json()
-      } 
-      throw response
+      } else {
+        response.text().then(text => { alert(text);})
+      }
     })
     .then((data) => {
       this.setState({products: reset ? data : this.state.products.concat(data)})
-      if (reset) {
-        this.getSummaryData("All")
-      }
+      this.getSummaryData("All")
     })
     .catch((error) => {
       console.error("Error fetching data: ", error);
@@ -94,12 +94,13 @@ export default class Product extends Component {
     fetch('/delete/product', requestOptions)
     .then((response) => {
       if (response.ok) {
+        console.log("hello")
+        this.setproductDescription(-1)
         const products = this.state.products
         const index = products.findIndex((e => e.ID === id))
         products.splice(index, 1)
         this.setState({
           products: products,
-          productDescription: -1
         })
       } else {
         response.text().then(text => { alert(text) })
@@ -207,6 +208,7 @@ export default class Product extends Component {
               <option value="HeadPhone">HeadPhone</option>
               <option value="Device">Device</option>
               <option value="Accessory">Accessory</option>
+              <option value="Other">Other</option>
             </Form.Select>
           </FloatingLabel>
           <SummaryChart categories={this.state.categories} series={this.state.series}/>

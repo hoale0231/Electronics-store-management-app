@@ -50,12 +50,38 @@ def queryInfo():
     colNames = [column[0] for column in cursor.description]
     results = dict(zip(colNames, cursor.fetchone()))
     
+    query = "exec getQuantityProductBranchs @ID = ?"
+    
+    try:
+        cursor.execute(query, id)
+    except pyodbc.Error as err:
+        print(err)
+        return Response(err.args[1], status=400)
+    
+    for row in cursor:
+        results[row[0]] = row[1]
+    
     return jsonify(results)
+
+def updateQuantityProductBranch(IDBranch, IDProd, Quantity):
+    query = "update ChiNhanh_Ban_SanPham set Quantity = ? where ID_Branch = ? and ID_Prod = ?"
+    try:
+        cursor.execute(query,  Quantity, IDBranch, IDProd)
+        conn.commit()
+    except pyodbc.ProgrammingError as e:
+        print("ERROR: " + str(e))
+        return (e.args[1], 400)  #send sql error msg back to client
+    return ("Success", 200)
     
 @Product.route("/edit/infoproduct", methods=["POST"])
 def editProduct():
     query = "exec updateSanPham "
+    id = request.json['ID']
     for k, v in request.json.items():
+        if k.strip().isnumeric():
+            status = updateQuantityProductBranch(k, id, v)
+            if status[1] == 200: continue
+            else: return Response(status[0], status=status[1])
         if v is None:
             continue
         if type(v) == str:
@@ -85,10 +111,25 @@ def deleteProduct():
         return Response(e.args[1], status=400)  #send sql error msg back to client
     return Response("Success", status=200)
 
+def insertQuantityProductBranch(IDProd, Quantity: dict):
+    query = "insert into ChiNhanh_Ban_SanPham (ID_Prod, ID_Branch, Quantity) values (?, ?, ?)"
+    for k, v in Quantity.items():
+        try:
+            cursor.execute(query, IDProd, k, v)
+            conn.commit()
+        except pyodbc.ProgrammingError as e:
+            print("ERROR: " + str(e))
+            return (e.args[1], 400)  #send sql error msg back to client
+    return ("Success", 200)
+
 @Product.route("/add/product", methods = ["POST"])
 def addProduct():
     query = "exec insertSanPham "
+    quantity = dict()
     for k, v in request.json.items():
+        if k.strip().isnumeric():
+            quantity[k] = v
+            continue
         if type(v) == str:
             query += f"@{k}=N\'{v}\',"
         else: 
@@ -96,10 +137,13 @@ def addProduct():
     query = query[:-1]
     try:
         cursor.execute(query)
+        insertQuantityProductBranch(cursor.fetchone()[0], quantity)
         conn.commit()
     except pyodbc.ProgrammingError as e:
         print("ERROR: " + str(e))
         return Response(e.args[1], status=400)  #send sql error msg back to client
+    
+    
     return Response("Success", status=200)
     
 @Product.route("/get/SummaryProduct", methods = ["GET"])
