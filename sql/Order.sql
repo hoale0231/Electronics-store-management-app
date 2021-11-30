@@ -21,22 +21,22 @@ begin
 		if @sumPrices < 0
 		begin
 			raiserror('Invalid SumPrices !', 16, 1);
-			rollback;
+			return;
 		end;
 		if not exists(select * from KhachHang where ID = @id_customer)
 		begin
 			raiserror('No customer with ID: %s', 16, 1, @id_customer);
-			rollback;
+			return;
 		end
 		if not exists(select * from NhanVien where ID = @id_employee)
 		begin
 			raiserror('No employee with ID: %s', 16, 1, @id_employee);
-			rollback;
+			return;
 		end
 		if @id_ad is not null and not exists(select * from CTKM_DonHang where ID = @id_ad)
 		begin
 			raiserror('No order sales with ID: %s', 16, 1, @id_ad);
-			rollback;
+			return;
 		end
 		insert into DonHang (ID, TimeCreated, SumPrices, ID_Customer, ID_Employee, ID_Ad)
 		values				(@id, @timeCreated, @sumPrices, @id_customer, @id_employee, @id_ad)
@@ -143,11 +143,6 @@ create or alter procedure InfoOrder
 	@id_order char(9)
 as
 begin
-	if not exists(select * from DonHang where ID = @id_order)
-	begin
-		raiserror('No order with ID: %s', 16, 1, @id_order);
-		rollback;
-	end
 	select SanPham_Thuoc_DonHang.ID_Order as ID_Order, SanPham.ProdName as Product_Name, SanPham.ProdType as Product_Type, ThietBiDienTu.DeviceType as Device_Type, SanPham.Price as Product_Price, SanPham_Thuoc_DonHang.Quantity as Quantity
 	from SanPham_Thuoc_DonHang, SanPham, ThietBiDienTu
 	where SanPham_Thuoc_DonHang.ID_Prod = SanPham.ID and SanPham_Thuoc_DonHang.ID_Prod = ThietBiDienTu.ID and SanPham_Thuoc_DonHang.ID_Order = @id_order 
@@ -163,11 +158,6 @@ go
 create or alter procedure LikedProduct (@prodType nvarchar(100) = 'All')
 as
 begin
-	if @prodType != 'Device' and @prodType != 'Accessory' and @prodType != 'All'
-	begin
-		raiserror('Invalid ProdType', 16, 1);
-		rollback;
-	end
 	select SanPham.ProdName as Product_Name, SanPham.ProdType as Product_Type, SanPham.Price as Product_Price, numSP.SumQuantity as Sold
 	from SanPham, (	select SanPham_Thuoc_DonHang.ID_Prod as ID_Product, sum(Quantity) as SumQuantity
 					from SanPham_Thuoc_DonHang, SanPham
@@ -196,10 +186,6 @@ begin
 	select @timeCreated = TimeCreated, @sumPrices = SumPrices, @id_ad = ID_Ad
 	from DonHang
 	where ID = @id_order
-	if @id_ad is not null
-	begin
-		return @id_ad
-	end
 	declare kmCursor cursor for select * from CTKM_DonHang;
 	open kmCursor;
 	fetch next from kmCursor into @id, @timeStart, @timeEnd, @promoLevel, @condition;
@@ -249,18 +235,29 @@ go
 
 -- Test
 -- Cau 1
-exec InsertDonHang @id = 'DH0000001', @timeCreated = '11-29-2021', @sumPrices = 0, @id_customer ='12', @id_employee = '7'
-exec InsertDonHang @id = 'DH0000002', @timeCreated = '11-30-2021', @sumPrices = 0, @id_customer ='10', @id_employee = '9', @id_ad = 'KMDH00001'
-exec InsertDonHang @id = 'DH0000003', @timeCreated = '11-30-2021', @sumPrices = 0, @id_customer ='15', @id_employee = '1', @id_ad = 'KMDH00002'
-exec InsertDonHang @id = 'DH0000004', @timeCreated = '11-30-2021', @sumPrices = 0, @id_customer ='14', @id_employee = '5', @id_ad = 'KMDH00002'
+-- Insert Don hang
+exec InsertDonHang @id = 'DH0000001', @timeCreated = '01-04-2020', @sumPrices = 0, @id_customer ='11', @id_employee = '7', @id_ad = 'KMDH00002'
+exec InsertDonHang @id = 'DH0000002', @timeCreated = '10-10-2020', @sumPrices = 0, @id_customer ='10', @id_employee = '9'
+exec InsertDonHang @id = 'DH0000003', @timeCreated = '01-14-2021', @sumPrices = 0, @id_customer ='15', @id_employee = '1', @id_ad = 'KMDH00003'
+exec InsertDonHang @id = 'DH0000004', @timeCreated = '09-09-2021', @sumPrices = 0, @id_customer ='14', @id_employee = '5', @id_ad = 'KMDH00004'
 exec InsertDonHang @id = 'DH0000005', @timeCreated = '11-30-2021', @sumPrices = 0, @id_customer ='7', @id_employee = '4'
-exec InsertDonHang @id = 'DH0000006', @sumPrices = 0, @id_customer ='1', @id_employee = '12'
-exec InsertDonHang @id = 'DH0000007', @id_customer ='5', @id_employee = '2'
+exec InsertDonHang @id = 'DH0000006', @id_customer ='2', @id_employee = '2'
+exec InsertDonHang @id = 'DH0000005', @timeCreated = '11-30-2021', @sumPrices = -1, @id_customer ='7', @id_employee = '4'
+exec InsertDonHang @id = 'DH0000005', @timeCreated = '11-30-2021', @sumPrices = 0, @id_customer ='20', @id_employee = '10'
+
 select * from DonHang
 go
 
 -- Cau 2
-insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000001', 'TBLT00001', 23000000, 2);
+insert into CTKM_DonHang (ID, TimeStart, TimeEnd, PromoLevel, Condition) values ('KMDH00005', '11-30-2021', '12-05-2021', 5, 10000000)
+insert into CTKM_DonHang (ID, TimeStart, TimeEnd, PromoLevel, Condition) values ('KMDH00006', '12-06-2021', '12-06-2021', 10, 10000000)
+insert into CTKM_DonHang (ID, TimeStart, TimeEnd, PromoLevel, Condition) values ('KMDH00007', '12-06-2021', '12-07-2021', 10, -1)
+insert into CTKM_DonHang (ID, TimeStart, TimeEnd, PromoLevel, Condition) values ('KMDH00008', '12-06-2021', '11-06-2021', 10, 10000000)
+
+select * from CTKM_DonHang
+go
+-- Insert San pham thuoc don hang
+insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000001', 'TBLT00001', 29690000, 2);
 insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000002', 'TBLT00007', 28000000, 1);
 insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000003', 'TBLT00007', 28000000, 1);
 insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000004', 'TBLT00007', 28000000, 1);
@@ -272,23 +269,13 @@ insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('
 select * from SanPham_Thuoc_DonHang
 go
 
-insert into CTKM_DonHang (ID, TimeStart, TimeEnd, PromoLevel, Condition) values ('KMDH00005', '11-30-2021', '12-05-2021', 10, 10000000)
-insert into CTKM_DonHang (ID, TimeStart, TimeEnd, PromoLevel, Condition) values ('KMDH00006', '12-06-2021', '12-06-2021', 10, 10000000)
-insert into CTKM_DonHang (ID, TimeStart, TimeEnd, PromoLevel, Condition) values ('KMDH00007', '12-06-2021', '12-07-2021', 10, -1)
-
-select * from CTKM_DonHang
-go
-
 -- Cau 3
 exec InfoOrder @id_order = 'DH0000004';
-exec InfoOrder @id_order = 'DH0000010';
 exec LikedProduct @prodType = 'Device';
 exec LikedProduct @prodType = 'Accessory';
 exec LikedProduct @prodType = 'All';
 
--- Câu 4
-select dbo.GetID_CTKM('DH0000004') 
+-- Cau 4
 select dbo.GetID_CTKM('DH0000005') 
 
-select * from NumEachType('DH0000003')
 select * from NumEachType('DH0000004')
