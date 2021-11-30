@@ -2,7 +2,7 @@ from flask import Flask
 from App.Product import Product
 from App.Sales import Sales
 from App.Toai import Toai
-from App.Tuan import Tuan
+from App.Customer import Customer
 from App.Staff import Staff
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ def index():
 app.register_blueprint(Product)
 app.register_blueprint(Sales, url_prefix="/api/sales")
 app.register_blueprint(Toai)
-app.register_blueprint(Tuan)
+app.register_blueprint(Customer)
 app.register_blueprint(Staff)
 
 # Remove debug param after finished testing

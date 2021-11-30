@@ -5,7 +5,7 @@ import Product from './Product/Product'
 import Sales from './Sales/Sales'
 import SalesManagement from './Sales/SalesManagement'
 import Toai from "./Toai/Toai";
-import Tuan from "./Tuan/Tuan";
+import Customer from "./Customer/Customer";
 import Staff from "./Staff/Staff";
 import { Navbar, Container, Nav } from 'react-bootstrap';
 
@@ -22,7 +22,7 @@ function NavBarHeader() {
             <Nav.Link href="/Sales">Sales</Nav.Link>
             <Nav.Link href="/SalesManagement">Sales Management</Nav.Link>
             <Nav.Link href="/Toai">Toai</Nav.Link>
-            <Nav.Link href="/Tuan">Tuan</Nav.Link>
+            <Nav.Link href="/Customer">Customer</Nav.Link>
             <Nav.Link href="/Staff">Staff</Nav.Link>
           </Nav>
         </Navbar.Collapse>
@@ -41,7 +41,7 @@ function App() {
           <Route path="/Sales" element={<Sales />} />
           <Route path="/SalesManagement" element={<SalesManagement />} />
           <Route path="/Toai" element={<Toai />} />
-          <Route path="/Tuan" element={<Tuan />} />
+          <Route path="/Customer" element={<Customer />} />
           <Route path="/Staff" element={<Staff />} />
         </Routes>
       </Router>

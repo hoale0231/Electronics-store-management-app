@@ -1,7 +1,7 @@
 import pyodbc
 
 # Connect to MS SqlServer. Change serverName if needed
-serverName = "WICII"
+serverName = "LAPTOP-IBRL3521"
 databaseName = "db_a2"
 conn = pyodbc.connect('Driver={SQL Server};'
                       'Server=' + serverName + ';'
