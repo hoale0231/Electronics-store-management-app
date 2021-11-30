@@ -1,4 +1,5 @@
-﻿create database db_a2;
+﻿drop database db_a2
+create database db_a2;
 go
 
 use db_a2;
@@ -207,3 +208,5 @@ create table MayTinhBang (
 	primary key (ID)
 );
 go
+
+create index idSanPham on SanPham (Price, PriceIn, Insurance, TotalQuantity)
