@@ -97,7 +97,7 @@ export default function StaffDescription(props) {
             </Row>
             <Modal.Footer>
               <Button type="submit">Save Changes</Button>
-              <Button variant="danger" onClick={() => { deleteStaff(id); }}>Delete Staff</Button>
+              {action === 'Edit' ? <Button variant="danger" onClick={() => { deleteStaff(id); }}>Delete Staff</Button> : <p />}
             </Modal.Footer>
           </Form>
         </Modal.Body>
