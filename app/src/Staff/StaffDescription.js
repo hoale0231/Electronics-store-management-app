@@ -1,6 +1,5 @@
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap'
 import { useState, useEffect } from "react";
-import "./StaffDescription.css"
 
 var number = /^-?\d+$/;
 

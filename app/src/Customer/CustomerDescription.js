@@ -1,8 +1,7 @@
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap'
 import BootstrapTable from "react-bootstrap-table-next";
-import { useState, useEffect } from "react";
-import "./CustomerDescription.css"
 import { Component } from "react";
+import "./customerDescription.css"
 
 export default class CustomerDescription extends Component {
 	constructor(props) {
@@ -13,6 +12,7 @@ export default class CustomerDescription extends Component {
 			action: props.action,
 			info: {},
 			validated: false,
+      Recommendee: []
 		}
 
 		this.handleInputChange = this.handleInputChange.bind(this);
@@ -32,6 +32,7 @@ export default class CustomerDescription extends Component {
 			console.log(data); 
 			this.setState({
 				info: data,
+        Recommendee: data["Recommendee"]
 			})
 		})
 		.catch((error) => {
@@ -52,18 +53,19 @@ export default class CustomerDescription extends Component {
     ]
 
     handleInputChange = (event) => {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
-		this.state.info[name] = value;
-		this.setState({
-			info: this.state.info
-		})
+      const target = event.target;
+      const value = target.type === 'checkbox' ? target.checked : target.value;
+      const name = target.name;
+      const info = this.state.info
+      info[name] = value;
+      this.setState({
+        info: info
+      })
     }
 
     isInt(value) {
         return !isNaN(value) && 
-               parseInt(Number(value)) == value && 
+               parseInt(Number(value)) === value && 
                !isNaN(parseInt(value, 10));
     }
     
@@ -102,7 +104,7 @@ export default class CustomerDescription extends Component {
 	render() {
     return (
         <div className="popup-background">
-        <Modal.Dialog className="popup modal-dialog-scrollable" size="lg">
+        <Modal.Dialog className="popup" id="customerPopup" size="xl">
             <Modal.Header closeButton onClick={() => this.setCustomerDescription(-1)}>
                 <Modal.Title>{this.state.action}</Modal.Title>
             </Modal.Header>
@@ -129,32 +131,10 @@ export default class CustomerDescription extends Component {
                     <InputGroupCustom info={this.state.info} handleInputChange={this.handleInputChange} attr="Num_ref" attrName="Number of Recommendees" md="6" required={true} disable={true}/> :
                     <p/>}
                 </Row>
-                {/* <Form.Group as={Col} md="12">
-                    <Form.Label>List of recommendees:</Form.Label>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                            {this.columns.map((item, i) => (
-                                <th name={item.dataField}>
-                                    {item.text}
-                                </th>
-                            ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.state.info["Recommendee"].map((item, i) =>  (
-								<tr>
-									{this.columns.map((colitem) => (
-										<td>{item[colitem]}</td>
-									))}
-								</tr>
-							))}
-                        </tbody>
-                    </table>
-                </Form.Group> */}
+
 				<div className="table-custom">
 					{/* https://react-bootstrap-table.github.io/react-bootstrap-table2/docs/about.html  */}
-					<BootstrapTable keyField="id" data={this.state.info["Recommendee"]} columns={this.columns}/>
+					<BootstrapTable keyField="id" data={this.state.Recommendee} columns={this.columns}/>
 				</div>
                 <Modal.Footer>
                     <Button type="submit">Save Changes</Button>

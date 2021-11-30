@@ -1,11 +1,11 @@
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap'
 import { useState, useEffect } from "react";
-import "./OrderDescription.css"
 import BootstrapTable from "react-bootstrap-table-next";
 
 export default function OrderDescription(props) {
   const {id, setOrderDescription, deleteOrder, action} = props
   const [info, setInfo] = useState({})
+  const [detail, setDetail] = useState([])
 
   useEffect(() => {
     if (action !== "Edit") {
@@ -19,14 +19,13 @@ export default function OrderDescription(props) {
           response.text().then(text => { alert(text);})
         }
       })
-      .then((data) => {console.log(data); setInfo(data)})
+      .then((data) => {setDetail(data["detail"]); setInfo(data)})
       .catch((error) => {
         console.error("Error fetching data: ", error);
       })
   }, [id, action])
 
   const [validated, setValidated] = useState(false);
-  const [detail, setDetail] = useState(false);
 
   const handleSubmit = (event) => {
     const form = event.currentTarget;
@@ -98,7 +97,7 @@ export default function OrderDescription(props) {
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Employee" attrName="Employee ID" required={true} md="4"/>
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Ad" attrName="CTKM ID" md="4"/>
             </Row>
-            <BootstrapTable keyField="id" data={info["detail"]} columns={columns}/>
+            <BootstrapTable keyField="id" data={detail} columns={columns}/>
             <Modal.Footer>
               {/* {action === "Edit" ? <Button type="detail" onClick={() => {setDetail(true)}}>Detail</Button> : <p/>} */}
               <Button type="submit">Save Changes</Button>

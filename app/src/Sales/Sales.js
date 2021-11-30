@@ -1,7 +1,7 @@
 import BootstrapTable from "react-bootstrap-table-next";
-import {Modal, Button, Form, Row, Col, FloatingLabel} from 'react-bootstrap'
+import { Button, Form, Row, Col, FloatingLabel} from 'react-bootstrap'
 import { useState, useEffect } from "react";
-import DatePicker, { registerLocale } from "react-datepicker";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 var viewMode = 'Product';

@@ -1,7 +1,7 @@
 import BootstrapTable from "react-bootstrap-table-next";
 import {Modal, Button, Form, Row, Col, FloatingLabel} from 'react-bootstrap'
 import { useState, useEffect } from "react";
-import DatePicker, { registerLocale } from "react-datepicker";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 Date.prototype.yyyymmdd = function() {
@@ -277,7 +277,7 @@ function NewProduct(props) {
      	return;
      }
      
-     if (ID.startsWith('KMSP') == false || ID.length !== 9)
+     if (ID.startsWith('KMSP') === false || ID.length !== 9)
      {
      	alert("ID must start with KMSP and has the length of 9");       
      	event.stopPropagation();
@@ -352,7 +352,7 @@ function NewProduct(props) {
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3" controlId="formSalesID">
               <Form.Label>Product ID</Form.Label>
-              <Form.Control type="ID" type="text" placeholder="Enter sales ID" onChange = {(event) =>{ID = event.target.value;}}/>
+              <Form.Control  type="text" placeholder="Enter sales ID" onChange = {(event) =>{ID = event.target.value;}}/>
             </Form.Group>
 
             <Row className="mb-3">
