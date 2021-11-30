@@ -7,7 +7,8 @@ import SalesManagement from './Sales/SalesManagement'
 import Order from "./Order/Order";
 import Customer from "./Customer/Customer";
 import Staff from "./Staff/Staff";
-import { Navbar, Container, Nav } from 'react-bootstrap';
+import Home from "./Home";
+import { Navbar, Container, Nav, NavDropdown } from 'react-bootstrap';
 
 
 function NavBarHeader() {
@@ -19,8 +20,10 @@ function NavBarHeader() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link href="/Product">Product</Nav.Link>
-            <Nav.Link href="/Sales">Sales</Nav.Link>
-            <Nav.Link href="/SalesManagement">Sales Management</Nav.Link>
+            <NavDropdown title="Sales" id="basic-nav-dropdown">
+              <NavDropdown.Item href="/Sales">Sales</NavDropdown.Item>
+              <NavDropdown.Item href="/SalesManagement">Sales Management</NavDropdown.Item>
+            </NavDropdown>
             <Nav.Link href="/Order">Order</Nav.Link>
             <Nav.Link href="/Customer">Customer</Nav.Link>
             <Nav.Link href="/Staff">Staff</Nav.Link>
@@ -37,6 +40,7 @@ function App() {
       <NavBarHeader fixed="top" />
       <Router>
         <Routes>
+          <Route path="/" element={<Home />} />
           <Route path="/Product" element={<Product />} />
           <Route path="/Sales" element={<Sales />} />
           <Route path="/SalesManagement" element={<SalesManagement />} />

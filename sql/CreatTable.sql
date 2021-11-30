@@ -1,4 +1,4 @@
-﻿drop database db_a2
+﻿--drop database db_a2
 create database db_a2;
 go
 

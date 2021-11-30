@@ -252,8 +252,8 @@ as begin
 end
 go
 -- example trigger 1
-delete from SanPham where ID = 'TBLT00008'
-select * from SanPham where ID = 'TBLT00008'
+delete from SanPham where ID = 'TBLT00001'
+select * from SanPham where ID = 'TBLT00001'
 go
 
 delete from SanPham where ID = 'TBLT00008'

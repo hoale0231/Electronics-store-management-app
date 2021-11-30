@@ -37,3 +37,7 @@
 .sr-only {
   display: none;
 }
+
+.topic {
+  text-align: center;
+}
