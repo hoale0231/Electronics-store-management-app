@@ -125,7 +125,7 @@ begin
 	where SanPham_ApDung_CTKM.Id_Prod = #TimeAffectedItem.Id_Prod and
 		  SanPham_ApDung_CTKM.ID_Ad = CTKM_SanPham.ID and
 		  not (#TimeAffectedItem.ID_Ad = CTKM_SanPham.ID) and
-		  CTKM_SanPham.TimeStart <= #TimeAffectedItem.TimeStart and
+		  CTKM_SanPham.TimeEnd <= #TimeAffectedItem.TimeStart and
 		  #TimeAffectedItem.TimeStart <= CTKM_SanPham.TimeEnd
 
 	delete from SanPham_ApDung_CTKM
@@ -149,13 +149,12 @@ as
 		from CTKM_SanPham, SanPham_ApDung_CTKM, SanPham
 		where SanPham_ApDung_CTKM.ID_Prod = @Id_Prod and
 			  SanPham_ApDung_CTKM.ID_Ad = CTKM_SanPham.ID and
-			  @StartTime >= CTKM_SanPham.TimeStart and
+			  @EndTime >= CTKM_SanPham.TimeStart and
 			  @StartTime <= CTKM_SanPham.TimeEnd and 
 			  SanPham.ID = @Id_Prod
 		order by TimeStart
 		SET NOCOUNT OFF;
 	end;
-
 
 --Ex3b: Get the products with the largest sales percentage of a brand in a time period
 go
@@ -171,7 +170,7 @@ begin
 			from SanPham, CTKM_SanPham, SanPham_ApDung_CTKM
 			where SanPham.ID = SanPham_ApDung_CTKM.ID_Prod 
 					and SanPham_ApDung_CTKM.ID_Ad = CTKM_SanPham.ID and
-					@StartTime >= CTKM_SanPham.TimeStart and
+					@EndTime >= CTKM_SanPham.TimeStart and
 					@StartTime <= CTKM_SanPham.TimeEnd 
 			group by manufacture
 			having manufacture = @brand) as MaxDeal, SanPham, SanPham_ApDung_CTKM, CTKM_SanPham
@@ -240,6 +239,8 @@ begin
 end
 go
 
+
+
 --Ex4b
 -- Tim chuong trinh khuyen mai co ti le khuyen mai cao nhat cua 1 mat hang o thoi diem hien tai
 go
@@ -278,5 +279,3 @@ begin
 	return
 end
 go
-
-applySalesForBrand 'KMSP00006', 'Apple'
