@@ -84,7 +84,7 @@ export default function ProductDescription(props) {
             <Row className="mb-3">
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="PriceIn" attrName="Import Price" required={true} md="4" pattern={number}/>
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Price" attrName="Default Price" required={true} md="4" pattern={number}/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Insurance" attrName="Insurance" md="4" />
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Insurance" attrName="Insurance" md="4" pattern={number}/>
             </Row>
             <Row className="mb-3">
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="1        " attrName="Quantity - Mộ Đức" required={true} md="4" pattern={number}/>
@@ -263,7 +263,7 @@ function InputGroupCustom(props) {
         pattern={pattern}
       />
       <Form.Control.Feedback type="invalid">
-        Invalid {attr}
+        Invalid {attrName}
       </Form.Control.Feedback>
   </Form.Group>
   )
