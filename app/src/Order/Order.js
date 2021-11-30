@@ -1,79 +1,111 @@
 import BootstrapTable from "react-bootstrap-table-next";
-import { Button, Form, Row, Col, FloatingLabel } from 'react-bootstrap'
-import { useState, useEffect } from "react";
+import { Button, ButtonGroup } from 'react-bootstrap';
 import OrderDescription from "./OrderDescription";
+import filterFactory from 'react-bootstrap-table2-filter';
+import { Component } from "react";
 
+export default class Order extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      orderDescription: -1,
+      orders: [],
+      numElement: 10
+    }
 
-export default function Order() {
-  const [orderDescription, setOrderDescription] = useState(-1)
-  const [order, setOrder] = useState([]);
+    this.getOrderData()
+    this.handleLoadMore = this.handleLoadMore.bind(this)
+    this.setOrderDescription = this.setOrderDescription.bind(this)
+    this.deleteOrder = this.deleteOrder.bind(this)
+  }
 
-
-  const columns = [
-    { dataField: "ID", text: "Order ID"},
-    { dataField: "TimeCreated", text: "Time Created"},
-    { dataField: "SumPrices", text: "Sum Prices"},
-    { dataField: "ID_Customer", text: "Customer ID"},
-    { dataField: "ID_Employee", text: "Employee ID"},
-    { dataField: "ID_Ad", text: "CTKM ID", }
-  ];
-
-  useEffect(() => {
+  getOrderData() {
     fetch("/api/order/all")
-      .then((response) => {
-        if (response.ok) {
-          return response.json()
-        }
-        throw response
-      })
-      .then((data) => { setOrder(data); })
-      .catch((error) => {
-        console.error("Error fetching data: ", error);
-      })
-  }, [])
+    .then((response) => {
+      if (response.ok) {
+        return response.json()
+      } else {
+        response.text().then(text => { alert(text);})
+      }
+    })
+    .then((data) => {
+      this.setState({orders: data})
+    })
+    .catch((error) => {
+      console.error("Error fetching data: ", error);
+    })
+  }
 
-  const deleteOrder = function (id) {
+  deleteOrder(id) {
     fetch("/api/order/remove?id=" + id, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       }
     })
-      .then((response) => {
-        if (response.ok) {
-          const index = order.findIndex((e => e.id === id))
-          order.splice(index, 1)
-          setOrder(order)
-          setOrderDescription(-1)
-          return response.json()
-        }
-        throw response
-      })
-
+    .then((response) => {
+      if (response.ok) {
+        this.setOrderDescription(-1)
+        const orders = this.state.orders
+        const index = orders.findIndex((e => e.ID === id))
+        orders.splice(index, 1)
+        this.setState({
+          orders: orders,
+        })
+      } else {
+        response.text().then(text => { alert(text) })
+      }
+    })
+    .catch((error) => {
+      console.error("Error detect: ", error);
+    })
   }
 
-  const rowEvents = {
+  rowEvents = {
     onClick: (e, row, rowIndex) => {
-      setOrderDescription(row.ID)
+      this.setState({orderDescription: row.ID})
     },
   };
 
-  return (
-    <div className="popup_container">
-      <Button className="customButton" variant="success" onClick={() => { setOrderDescription(0) }}>Add Order</Button>
+  columns = [
+    { dataField: "ID", text: "Order ID", sort: true},
+    { dataField: "TimeCreated", text: "Time Created", sort: true},
+    { dataField: "SumPrices", text: "Sum Prices"},
+    { dataField: "ID_Customer", text: "Customer ID"},
+    { dataField: "ID_Employee", text: "Employee ID"},
+    { dataField: "ID_Ad", text: "CTKM ID", }
+  ];
 
-      <div className="table-custom">
-        {/* https://react-bootstrap-table.github.io/react-bootstrap-table2/docs/about.html  */}
-        <BootstrapTable keyField="id" data={order} columns={columns} rowEvents={rowEvents}/>
+  handleLoadMore() {
+    this.setState(prevState => ({
+      numElement: prevState.numElement * 2
+    }));
+  }
+
+  setOrderDescription(id) {
+    this.setState({
+      orderDescription: id
+    })
+  }
+  render() {
+    return (
+      <div className="popup_container">
+        <h1>Order Table</h1>
+        <Button className="customButton" variant="success" onClick={() => {this.setOrderDescription(0)}}>Add Order</Button>
+        <div className="table-custom">
+          <BootstrapTable keyField="id" data={this.state.orders.slice(0, this.state.numElement)} columns={this.columns} rowEvents={this.rowEvents} filter={filterFactory()}/>
+        </div>
+        <div className="container">
+          <ButtonGroup className="me-2">
+            <Button variant="success" onClick={() => {this.handleLoadMore()}}>Load More</Button>
+          </ButtonGroup>
+        </div>
+        <div>
+          {this.state.orderDescription === -1 ? <p/> : this.state.orderDescription === 0 ?
+            <OrderDescription id={this.state.orderDescription} setOrderDescription={this.setOrderDescription} action={'Add'}/> :
+            <OrderDescription id={this.state.orderDescription} setOrderDescription={this.setOrderDescription} deleteOrder={this.deleteOrder} action={'Edit'}/>}
+        </div>
       </div>
-      {/* <div className="container">
-        <Button variant="success" onClick={() => { loadData(false) }}>Load More</Button>
-      </div> */}
-      <div>
-        {orderDescription === -1 ? <p/> : orderDescription === 0 ?
-          <OrderDescription id={orderDescription} setOrderDescription={setOrderDescription} action={'Add'}/> :
-          <OrderDescription id={orderDescription} setOrderDescription={setOrderDescription} deleteOrder={deleteOrder} action={'Edit'}/>}
-      </div>
-    </div>
-  );
+    );
+  }
 }

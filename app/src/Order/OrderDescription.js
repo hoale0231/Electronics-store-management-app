@@ -1,11 +1,10 @@
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap'
 import { useState, useEffect } from "react";
 import "./OrderDescription.css"
-
-var number = /^-?\d+$/;
+import OrderDetail from "./OrderDetail"
 
 export default function OrderDescription(props) {
-  const { id, setOrderDescription, deleteOrder, action } = props
+  const {id, setOrderDescription, deleteOrder, action} = props
   const [info, setInfo] = useState({})
 
   useEffect(() => {
@@ -16,21 +15,29 @@ export default function OrderDescription(props) {
       .then((response) => {
         if (response.ok) {
           return response.json()
+        } else {
+          response.text().then(text => { alert(text);})
         }
-        throw response
       })
-      .then((data) => { console.log(data); setInfo(data) })
+      .then((data) => {console.log(data); setInfo(data)})
       .catch((error) => {
         console.error("Error fetching data: ", error);
       })
   }, [id, action])
 
   const [validated, setValidated] = useState(false);
+  const [detail, setDetail] = useState(false);
 
   const handleSubmit = (event) => {
     const form = event.currentTarget;
-    if (!number.test(form.Salary.value)) {
-      alert("Import salary much be number!")
+    if (form.ID_Customer.value === "") {
+      alert("Import Customer ID!")
+      event.stopPropagation();
+      event.preventDefault();
+      return
+    }
+    if (form.ID_Employee.value === "") {
+      alert("Import Employee ID!")
       event.stopPropagation();
       event.preventDefault();
       return
@@ -62,7 +69,6 @@ export default function OrderDescription(props) {
     const value = target.type === 'checkbox' ? target.checked : target.value;
     const name = target.name;
     info[name] = value;
-    // if (name === "ProdType") setProdType(value)
   }
 
 
@@ -77,21 +83,24 @@ export default function OrderDescription(props) {
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Row className="mb-3">
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID" attrName="ID" required={true} md="4" disable={action === 'Edit'}/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="TimeCreated" attrName="Time Created" required={true} md="4" disable={action === 'Edit'}/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="SumPrices" attrName="Sum Prices" required={true} md="4"/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="TimeCreated" attrName="Time Created" md="4"/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="SumPrices" attrName="Sum Prices" md="4"/>
             </Row>
             <Row className="mb-3">
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Customer" attrName="Customer ID" required={true} md="4"/>
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Employee" attrName="Employee ID" required={true} md="4"/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Ad" attrName="CTKM ID" required={true} md="4"/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Ad" attrName="CTKM ID" md="4"/>
             </Row>
             <Modal.Footer>
+              {/* {action === "Edit" ? <Button type="detail" onClick={() => {setDetail(true)}}>Detail</Button> : <p/>} */}
               <Button type="submit">Save Changes</Button>
-              <Button variant="danger" onClick={() => { deleteOrder(id); }}>Delete Order</Button>
+              {action === "Edit" ? <Button variant="danger" onClick={() => {deleteOrder(id)}}>Delete Order</Button> : <p/>}
             </Modal.Footer>
+            {/* <div>
+              {detail ? <OrderDetail id={id} setDetail={setDetail}/> : <p/>}
+            </div> */}
           </Form>
         </Modal.Body>
-
       </Modal.Dialog>
     </div>
   )
