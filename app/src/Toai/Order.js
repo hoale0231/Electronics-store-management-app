@@ -27,7 +27,6 @@ export default class Product extends Component {
     this.handleChangeSort = this.handleChangeSort.bind(this)
     this.handleChangeSortBy = this.handleChangeSortBy.bind(this)
     this.setproductDescription = this.setproductDescription.bind(this)
-    this.deleteProduct = this.deleteProduct.bind(this)
   }
 
   getSummaryData(ProdType) {
@@ -35,11 +34,11 @@ export default class Product extends Component {
     .then((response) => {
         if(response.ok) {
             return response.json()
-        } else {
-          response.text().then(text => { alert(text);})
         }
+        throw response
     })
     .then((data) => {
+      console.log(data)
       var categories = []
       var series = []
       data.forEach(element => {
@@ -72,13 +71,14 @@ export default class Product extends Component {
     .then((response) => {
       if (response.ok) {
         return response.json()
-      } else {
-        response.text().then(text => { alert(text);})
-      }
+      } 
+      throw response
     })
     .then((data) => {
       this.setState({products: reset ? data : this.state.products.concat(data)})
-      this.getSummaryData("All")
+      if (reset) {
+        this.getSummaryData("All")
+      }
     })
     .catch((error) => {
       console.error("Error fetching data: ", error);
@@ -94,13 +94,12 @@ export default class Product extends Component {
     fetch('/delete/product', requestOptions)
     .then((response) => {
       if (response.ok) {
-        console.log("hello")
-        this.setproductDescription(-1)
         const products = this.state.products
         const index = products.findIndex((e => e.ID === id))
         products.splice(index, 1)
         this.setState({
           products: products,
+          productDescription: -1
         })
       } else {
         response.text().then(text => { alert(text) })
@@ -122,8 +121,7 @@ export default class Product extends Component {
     { dataField: "ProdName",      text: "Product Name",   filter: textFilter() }, 
     { dataField: "PriceIn",       text: "Import Price ",  filter: textFilter() }, 
     { dataField: "Price",         text: "Default Price",  filter: textFilter() }, 
-    { dataField: "CurrentPrice",  text: "Current Price",  filter: textFilter() },
-    { dataField: "Insurance",     text: "Insurance",      filter: textFilter() }, 
+    { dataField: "CurrentPrice",  text: "Current Price",  filter: textFilter() }, 
     { dataField: "TotalQuantity", text: "Total Quantity", filter: textFilter() }
   ];
 
@@ -198,22 +196,7 @@ export default class Product extends Component {
   render() {
   return (
       <div className="popup_container">
-        <h1>Product summary</h1>
-          <FloatingLabel label="Filter by product type">
-            <Form.Select onChange={this.handleChangeSummary}>
-              <option value='All'>All</option>
-              <option value="Laptop">Laptop</option>
-              <option value="Phone">Phone</option>
-              <option value="Tablet">Tablet</option>
-              <option value="Mouse">Mouse</option>
-              <option value="HeadPhone">HeadPhone</option>
-              <option value="Device">Device</option>
-              <option value="Accessory">Accessory</option>
-              <option value="Other">Other</option>
-            </Form.Select>
-          </FloatingLabel>
-          <SummaryChart categories={this.state.categories} series={this.state.series}/>
-        <h1>Product Table</h1>
+        <h1>Order Table</h1>
         <div>
           {this.selectGroup()}
         </div>

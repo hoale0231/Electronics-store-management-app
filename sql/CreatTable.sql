@@ -29,8 +29,8 @@ create table DonHang (
 	ID			char(9)			not null,
 	TimeCreated	date			not null,
 	SumPrices	int				not null,
-	ID_Customer	char(9),
-	ID_Employee char(9),
+	ID_Customer	char(9)			not null,
+	ID_Employee char(9)			not null,
 	ID_Ad		char(9),
 	primary key (ID)
 );
