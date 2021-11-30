@@ -12,9 +12,8 @@
     position: relative;
     margin: auto;
     height: 50%;
-    margin-top: calc(5vh);
+    margin-top: calc(10vh);
     background: #fff;
-    z-index: 1000
 }
 
 .body-popup {

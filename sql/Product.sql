@@ -94,10 +94,10 @@ begin
 end;
 go
 -- example function 1
-select dbo.getValidSanPhamID('Device', 'Laptop') as NEW_ID
-select dbo.getValidSanPhamID('Accessory', 'HeadPhone') as NEW_ID
+select * from Laptop;
+select dbo.getValidSanPhamID('Device', 'Laptop') as NEW_ID;
 select * from SanPham
-where ID = dbo.getValidSanPhamID('Device', 'Laptop')
+where ID = dbo.getValidSanPhamID('Accessory', 'Phone')
 go
 
 -- function 2
@@ -152,7 +152,7 @@ as
 begin 
     set nocount on;
 	set xact_abort on;
-	BEGIN TRANSACTION;
+	begin transaction;
 		if @ID is NULL
 			set @ID = dbo.getValidSanPhamID(@ProdType, @DeviceType);
 		else if left(@ID, 4) != left(dbo.getValidSanPhamID(@ProdType, @DeviceType), 4)
@@ -210,10 +210,10 @@ begin
 				throw 52000, @msg1, 1;
 			end 
 		select @ID as ID
-	COMMIT TRANSACTION;
+	commit transaction;
 	set nocount off;
 	set xact_abort off;
-END;
+end;
 go
 -- example procedure insert
 delete from SanPham where ProdName = 'test'
@@ -265,7 +265,7 @@ after insert
 as begin
 	set nocount on;
 	set xact_abort on;
-	BEGIN TRANSACTION;
+	begin transaction;
 		declare @price int, @priceIn int, @Insurance int, @ID char(9), @ProdType nvarchar(100), @ID_branch char(9);
 		select @priceIn = PriceIn, @price = Price, @Insurance = Insurance, @ID = ID, @ProdType = ProdType from inserted;
 
@@ -305,10 +305,10 @@ as begin
 		close branchCursor;
 		deallocate branchCursor;
 
-	COMMIT TRANSACTION;
+	commit transaction;
 	set nocount off;
 	set xact_abort off;
-	end;
+end;
 go
 -- example trigger 2
 exec insertSanPham @ID = 'TBLT00008',  @ProdName = 'test',  @PriceIn = 1,  @Price = 1, @ProdType = 'Device', @DeviceType = 'Laptop'
@@ -387,13 +387,13 @@ after delete
 as	begin
 	set nocount on;
 	set xact_abort on;
-	BEGIN TRANSACTION;
+	begin transaction;
 		declare @ID_Prod char(9);
 		select @ID_Prod = ID_Prod from deleted
 
 		delete from SanPham
 		where ID = @ID_Prod and Available = 0
-	commit TRANSACTION;
+	commit transaction;
 	set nocount off;
 	set xact_abort off;
 	end;
@@ -404,7 +404,7 @@ after update
 as begin
 	set nocount on;
 	set xact_abort on;
-	BEGIN TRANSACTION;
+	begin transaction;
 		declare @price int, @priceIn int, @Insurance int, @ID char(9), @ProdType nvarchar(100);
 		declare productCursor cursor for select PriceIn, Price, Insurance, ID, ProdType from inserted;
 		open productCursor;
@@ -433,7 +433,7 @@ as begin
 		end
 		close productCursor;
 		deallocate productCursor;
-	COMMIT TRANSACTION;
+	commit transaction;
 	set nocount off;
 	set xact_abort off;
 end;
@@ -445,7 +445,7 @@ instead of insert as
 begin 
 	set nocount on;
 	set xact_abort on;
-	BEGIN TRANSACTION;
+	begin transaction;
 		declare @ID_branch char(9), @ID_Prod char(9), @Quantity int;
 		declare qtyCursor cursor for select ID_Branch, ID_Prod, Quantity from inserted;
 		open qtyCursor;
@@ -463,7 +463,7 @@ begin
 		end
 		close qtyCursor;
 		deallocate qtyCursor;
-	COMMIT TRANSACTION;
+	commit transaction;
 	set nocount off;
 	set xact_abort off;
 end
@@ -475,7 +475,7 @@ after insert, update, delete
 as	begin
 	set nocount on;
 	set xact_abort on;
-	BEGIN TRANSACTION;
+	begin transaction;
 		declare @Qty int, @prodID char(9);
 		-- on insert
 		declare BranchProductCursor cursor for select ID_Prod, Quantity from inserted;
@@ -508,7 +508,7 @@ as	begin
 		end
 		close BranchProductCursor;
 		deallocate BranchProductCursor;
-	commit TRANSACTION;
+	commit transaction;
 	set nocount off;
 	set xact_abort off;
 	end;
@@ -583,7 +583,7 @@ as
 begin 
     set nocount on;
 	set xact_abort on;
-	BEGIN TRANSACTION;
+	begin transaction;
 		-- insert Sanpham
 		update SanPham 
 		set ProdName = @ProdName, PriceIn = @PriceIn,  Price = @Price, Insurance = @Insurance, Other = @Other, manufacture = @Manufacture
@@ -617,7 +617,7 @@ begin
 		set HPhoneType = @HPhoneType
 		where ID = @ID
 		
-	COMMIT TRANSACTION;
+	commit transaction;
 	set nocount off;
 	set xact_abort off;
 END;
