@@ -4,10 +4,9 @@ import pyodbc
 serverName = "LAPTOP-4BBHBT8G\SQLEXPRESS"
 databaseName = "db_a2"
 conn = pyodbc.connect('Driver={SQL Server};'
-                    'Server=' + serverName + ';'
-                    'Database=' + databaseName + ';'
-                    'Trusted_Connection=yes;' +
-                    'ansi=True')
+                      'Server=' + serverName + ';'
+                      'Database=' + databaseName + ';'
+                      'Trusted_Connection=yes;' +
+                      'ansi=True')
 
 cursor = conn.cursor()
-
