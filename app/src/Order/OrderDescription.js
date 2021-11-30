@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap'
 import { useState, useEffect } from "react";
 import "./OrderDescription.css"
-import OrderDetail from "./OrderDetail"
+import BootstrapTable from "react-bootstrap-table-next";
 
 export default function OrderDescription(props) {
   const {id, setOrderDescription, deleteOrder, action} = props
@@ -71,7 +71,14 @@ export default function OrderDescription(props) {
     info[name] = value;
   }
 
-
+  const columns = [
+    { dataField: "ID_Order", text: "Order ID"},
+    { dataField: "Product_Name", text: "Product Name"},
+    { dataField: "Product_Type", text: "Product Type"},
+    { dataField: "Device_Type", text: "Device Type"},
+    { dataField: "Product_Price", text: "Product Price"},
+    { dataField: "Quantity", text: "Quantity"},
+  ];
   return (
     <div className="popup-background">
       <Modal.Dialog className="popup" size="lg">
@@ -91,6 +98,7 @@ export default function OrderDescription(props) {
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Employee" attrName="Employee ID" required={true} md="4"/>
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Ad" attrName="CTKM ID" md="4"/>
             </Row>
+            <BootstrapTable keyField="id" data={info["detail"]} columns={columns}/>
             <Modal.Footer>
               {/* {action === "Edit" ? <Button type="detail" onClick={() => {setDetail(true)}}>Detail</Button> : <p/>} */}
               <Button type="submit">Save Changes</Button>
@@ -99,6 +107,7 @@ export default function OrderDescription(props) {
             {/* <div>
               {detail ? <OrderDetail id={id} setDetail={setDetail}/> : <p/>}
             </div> */}
+
           </Form>
         </Modal.Body>
       </Modal.Dialog>

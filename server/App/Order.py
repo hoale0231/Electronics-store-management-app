@@ -19,26 +19,6 @@ def queryAllOrder():
     results = [dict(zip(colNames, row)) for row in cursor]
     return jsonify(results)
 
-@Order.route("/api/order/info", methods=["GET"])
-def queryInfo():
-    id = request.args.get("id")
-
-    if id == None:
-        return Response("Must provide ID!", status=400)
-
-    query = "select * from DonHang where ID = ?"
-
-    try:
-        cursor.execute(query, id)
-    except pyodbc.Error as err:
-        print(err)
-        return Response(err.args[1], status=400)
-
-    colNames = [column[0] for column in cursor.description]
-    results = dict(zip(colNames, cursor.fetchone()))
-
-    return jsonify(results)
-
 
 @Order.route("/api/order/remove", methods=["POST"])
 def removeOrder():
@@ -95,10 +75,7 @@ def updateOrder():
         return Response(e.args[1], status=400)
     return Response("Success", status=200)
 
-@Order.route("/get/detail", methods=["GET"])
-def getProductsOfOrder():
-    id = request.args.get("id")
-
+def getProductsOfOrder(id):
     query = "exec InfoOrder @id_order = ?"
     
     try:
@@ -108,4 +85,26 @@ def getProductsOfOrder():
         return Response(err.args[1], status=400)
     colNames = [column[0] for column in cursor.description]
     results = [dict(zip(colNames, row)) for row in cursor]
+    return results
+
+@Order.route("/api/order/info", methods=["GET"])
+def queryInfo():
+    id = request.args.get("id")
+
+    if id == None:
+        return Response("Must provide ID!", status=400)
+
+    query = "select * from DonHang where ID = ?"
+
+    try:
+        cursor.execute(query, id)
+    except pyodbc.Error as err:
+        print(err)
+        return Response(err.args[1], status=400)
+
+    colNames = [column[0] for column in cursor.description]
+    results = dict(zip(colNames, cursor.fetchone()))
+
+    results["detail"] = getProductsOfOrder(id)
+    
     return jsonify(results)
