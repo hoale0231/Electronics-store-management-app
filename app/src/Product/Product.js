@@ -122,7 +122,8 @@ export default class Product extends Component {
     { dataField: "ProdName",      text: "Product Name",   filter: textFilter() }, 
     { dataField: "PriceIn",       text: "Import Price ",  filter: textFilter() }, 
     { dataField: "Price",         text: "Default Price",  filter: textFilter() }, 
-    { dataField: "CurrentPrice",  text: "Current Price",  filter: textFilter() }, 
+    { dataField: "CurrentPrice",  text: "Current Price",  filter: textFilter() },
+    { dataField: "Insurance",     text: "Insurance",      filter: textFilter() }, 
     { dataField: "TotalQuantity", text: "Total Quantity", filter: textFilter() }
   ];
 
