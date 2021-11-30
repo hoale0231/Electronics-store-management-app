@@ -117,7 +117,7 @@ function InputGroupCustom(props) {
         required={required}
         disabled={disable}
         name={attr}
-        type="text"
+        type={attr !== "Bdate" ? "text" : "date"}
         defaultValue={info[attr]}
         onChange={handleInputChange}
       />
