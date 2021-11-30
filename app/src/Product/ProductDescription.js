@@ -2,7 +2,7 @@ import {Modal, Button, Form, Row, Col} from 'react-bootstrap'
 import { useState, useEffect } from "react";
 import "./ProductDescription.css"
 
-var number = /^-?\d+$/;
+var number = '^[0-9\b]+$';
 
 export default function ProductDescription(props) {
   const {id, setproductDescription, deleteProduct, action} = props
@@ -32,25 +32,6 @@ export default function ProductDescription(props) {
   const handleSubmit = (event) => {
     const form = event.currentTarget;
 
-    if (!number.test(form.Price.value)) {
-      alert("Default price much be number!")
-      event.stopPropagation();
-      event.preventDefault();
-      return
-    }
-    if (!number.test(form.PriceIn.value)) {
-      alert("Imort price much be number!")
-      event.stopPropagation();
-      event.preventDefault();
-      return
-    }
-    if (!number.test(form.Insurance.value) && form.Insurance.value !== "") {
-      alert("Insurance much be number!")
-      event.stopPropagation();
-      event.preventDefault();
-      return
-    }
-
     setValidated(true);
     if (form.checkValidity() === false) {
       event.stopPropagation();
@@ -68,11 +49,14 @@ export default function ProductDescription(props) {
       .then(response => {
         if (response.ok) {
           setproductDescription(-1)
+          window.location.reload(false);
         } else {
           response.text().then(text => { alert(text);})
         }
       }) 
     }
+    event.stopPropagation();
+    event.preventDefault();
   };
 
   const handleInputChange = (event) => {
@@ -98,17 +82,17 @@ export default function ProductDescription(props) {
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="manufacture" attrName="Brand" md="4"/>
             </Row>
             <Row className="mb-3">
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="PriceIn" attrName="Import Price" required={true} md="4"/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Price" attrName="Default Price" required={true} md="4"/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Insurance" attrName="Insurance" md="4"/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="PriceIn" attrName="Import Price" required={true} md="4" pattern={number}/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Price" attrName="Default Price" required={true} md="4" pattern={number}/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Insurance" attrName="Insurance" md="4" />
             </Row>
             <Row className="mb-3">
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="1        " attrName="Quantity - Mộ Đức" required={true} md="4"/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="2        " attrName="Quantity - TP Quảng Ngãi" required={true} md="4"/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="3        " attrName="Quantity - Đức Phổ" md="4" required={true}/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="1        " attrName="Quantity - Mộ Đức" required={true} md="4" pattern={number}/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="2        " attrName="Quantity - TP Quảng Ngãi" required={true} md="4" pattern={number}/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="3        " attrName="Quantity - Đức Phổ" md="4" required={true} pattern={number}/>
             </Row>
             <Row className="mb-3">
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="TotalQuantity" attrName="Total Quantity" md="4" disable={true}/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="TotalQuantity" attrName="Total Quantity" md="4" disable={true} pattern={number}/>
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Other" attrName="Other" md="4"/>
               <Form.Group as={Col} md={4}>
                 <Form.Label>Product Type</Form.Label>
@@ -265,7 +249,7 @@ function HeadPhone(props) {
 }
 
 function InputGroupCustom(props) {
-  const {info, attr, attrName, required, handleInputChange, md, disable} = props
+  const {info, attr, attrName, required, handleInputChange, md, disable, pattern} = props
   return (
     <Form.Group as={Col} md={md}>
       <Form.Label>{attrName}</Form.Label>
@@ -276,6 +260,7 @@ function InputGroupCustom(props) {
         type="text"
         defaultValue={info[attr]}
         onChange={handleInputChange}
+        pattern={pattern}
       />
       <Form.Control.Feedback type="invalid">
         Invalid {attr}
