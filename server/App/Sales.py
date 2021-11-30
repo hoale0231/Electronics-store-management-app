@@ -67,13 +67,29 @@ def getAllProductsOfSales():
     colNames = [column[0] for column in cursor.description]
     results = [dict(zip(colNames, row)) for row in records]
     return jsonify(results)
+    
+@Sales.route("/get/applied-products/", methods=["GET"])
+def getProductsOfSalesbyDate():
+    startDate = request.args.get("startDate")
+    endDate = request.args.get("endDate")
+    query = '''select CTKM_SanPham.ID, TimeStart, TimeEnd, PromoLevel, SanPham.ID as ProdID, ProdName, SanPham.manufacture
+                from CTKM_SanPham, SanPham, SanPham_ApDung_CTKM
+                where CTKM_SanPham.ID = SanPham_ApDung_CTKM.ID_Ad and
+                SanPham.ID = SanPham_ApDung_CTKM.ID_Prod
+                and TimeStart <= ? and ? <= TimeEnd order by TimeStart'''
+    
+    cursor.execute(query, startDate, startDate)
+    records = cursor.fetchall()
+    colNames = [column[0] for column in cursor.description]
+    results = [dict(zip(colNames, row)) for row in records]
+    return jsonify(results)
 
-@Sales.route("/add/sales", methods=["POST"])
+@Sales.route("/add/sales", methods=["GET"])
 def addSales():
-    id = request.form.get("id")
-    startDate = request.form.get("startDate")
-    endDate = request.form.get("endDate")
-    rate = request.form.get("rate")
+    id = request.args.get("id")
+    startDate = request.args.get("startDate")
+    endDate = request.args.get("endDate")
+    rate = request.args.get("rate")
 
     if (id == None or startDate == None or endDate == None or rate == None):
         return Response("Not enough information", status=400)
@@ -82,7 +98,7 @@ def addSales():
         query = "insert into CTKM_SanPham(ID, TimeStart, TimeEnd, PromoLevel) values (?, ?, ?, ?)"
         cursor.execute(query, id, startDate, endDate, rate)
         conn.commit()
-    except pyodbc.ProgrammingError as e:
+    except pyodbc.Error as e:
         print("ERROR: " + str(e))
         return Response(e.args[1], status=400)  #send sql error msg back to client
     return Response("Success", status=200)
@@ -99,7 +115,7 @@ def applySalesToProduct():
         query = "insert into SanPham_ApDung_CTKM(ID_Prod, ID_Ad) values (?, ?)"
         cursor.execute(query, productId, salesId)
         conn.commit()
-    except pyodbc.ProgrammingError as e:
+    except pyodbc.Error as e:
         print("ERROR: " + str(e))
         return Response(e.args[1], status=400)
     return Response("Success", status=200)
@@ -116,7 +132,7 @@ def applySalesToBrand():
         query = "exec applySalesForBrand ?, ?"
         cursor.execute(query, salesId, brandName)
         conn.commit()
-    except pyodbc.ProgrammingError as e:
+    except pyodbc.Error as e:
         print("ERROR: " + str(e))
         return Response(e.args[1], status=400)
     return Response("Success", status=200)

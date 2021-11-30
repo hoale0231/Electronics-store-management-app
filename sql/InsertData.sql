@@ -93,21 +93,21 @@ values	('KMSP00006', 'TBLT00002'),
 
 -- insert NhanVien
 insert into NhanVien (ID, Username, Passwd, IdNum, Phone, Salary, Bdate, Fname, Lname, Email, Addr, ID_branch) values
-	('1', 'dangtu2001', 'tu123456', '212716385', '0331263856', 18000000, '12-07-2001', N'Nguyễn Đăng', N'Tú', 'tu123@gmail.com', N'Mộ Đức, Quảng Ngãi', 1),
-	('2', 'dangquan1996', 'quan123456', '212716465', '0336124764', 10000000, '03-04-1996', N'Nguyễn Đăng', N'Quân', 'quan123@gmail.com', N'Mộ Đức, Quảng Ngãi', 1),
-	('3', 'tuananh1995', 'anh123456', '212343126', '0949445728', 8000000, '12-03-1995', N'Bùi Tuấn', 'Anh', 'anh123@gmail.com', N'Tư Nghĩa, Quảng Ngãi', 1),
-	('4', 'honganh2000', 'hanh123456', '211416235', '0396414368', 8500000, '12-02-2000', N'Võ Hồng', N'Ánh', 'hanh123@gmail.com', N'Nghĩa Hành, Quảng Ngãi', 1),
-	('5', 'hungcuong1994', 'cuong123456', '212345638', '0349781353', 8000000, '03-12-1994', N'Phan Hùng', N'Cường', 'cuong123@gmail.com', N'Mộ Đức, Quảng Ngãi', 1),
-	('6', 'lamthao1994', 'thao123456', '213416985', '0376529187', 18000000, '02-10-1994', N'Ba Ngọc Lam', 'thao', 'thao123@gmail.com', N'Mộ Đức, Quảng Ngãi', 2),
-	('7', 'ducbao1990', 'bao123456', '213218160', '0347483567', 10000000, '04-23-1990', N'Trần Đức', N'Bảo', 'bao123@gmail.com', N'Nghĩa Hành, Quảng Ngãi', 2),
-	('8', 'bichdieu1992', 'dieu123456', '213415642', '0967217358', 9000000, '02-18-1992', N'Lê Bích', N'Diệu', 'dieu123@gmail.com', N'Mộ Đức, Quảng Ngãi', 2),
-	('9', 'tanbut2000', 'but123456', '212718752', '0332142856', 8000000, '03-09-2000', N'Đỗ Tấn', N'Bút', 'but123@gmail.com', N'Ba Tơ, Quảng Ngãi', 2),
-	('10', 'hanhgiang1995', 'giang123456', '212314927', '0923167840', 12000000, '12-17-1995', N'Nguyễn Hạnh', N'Giang', 'giang123@gmail.com', N'Mộ Đức, Quảng Ngãi', 2),
-	('11', 'tuantrai1990', 'trai123456', '211911337', '0394521678', 18000000, '02-13-1990', N'Trần Tuấn', N'Trãi', 'trai123@gmail.com', N'Đức Phổ, Quảng Ngãi', 3),
-	('12', 'leduan1987', 'duan123456', '213412845', '0125234945', 12000000, '05-14-1987', N'Nguyễn Lê', N'Duẩn', 'duan123@gmail.com', N'Nghĩa Hành, Quảng Ngãi', 3),
-	('13', 'minhthuy2000', 'thuy123456', '212317840', '0338741365', 10000000, '01-07-2000', N'Lê Minh', N'Thùy', 'thuy123@gmail.com', N'TP Quảng Ngãi, Quảng Ngãi', 3),
-	('14', 'camvien1994', 'vien123456', '212117438', '0325498174', 8500000, '11-15-1994', N'Võ Cẩm', N'Viên', 'vien123@gmail.com', N'Trà Bồng, Quảng Ngãi', 3),
-	('15', 'thuytrang1996', 'trang123456', '211314135', '0394528145', 9000000, '03-11-1956', N'Phan Thùy', 'Trang', 'trang123@gmail.com', N'Sơn Trà, Quảng Ngãi', 3);
+	('1', 'dangtu2001', 'tu123456', '212716385', '0331263856', 18000000, '12-07-2001', N'Nguyễn Đăng', N'Tú', 'tu123@gmail.com', N'Mộ Đức, Quảng Ngãi', '1'),
+	('2', 'dangquan1996', 'quan123456', '212716465', '0336124764', 10000000, '03-04-1996', N'Nguyễn Đăng', N'Quân', 'quan123@gmail.com', N'Mộ Đức, Quảng Ngãi', '1'),
+	('3', 'tuananh1995', 'anh123456', '212343126', '0949445728', 8000000, '12-03-1995', N'Bùi Tuấn', 'Anh', 'anh123@gmail.com', N'Tư Nghĩa, Quảng Ngãi', '1'),
+	('4', 'honganh2000', 'hanh123456', '211416235', '0396414368', 8500000, '12-02-2000', N'Võ Hồng', N'Ánh', 'hanh123@gmail.com', N'Nghĩa Hành, Quảng Ngãi', '1'),
+	('5', 'hungcuong1994', 'cuong123456', '212345638', '0349781353', 8000000, '03-12-1994', N'Phan Hùng', N'Cường', 'cuong123@gmail.com', N'Mộ Đức, Quảng Ngãi', '1'),
+	('6', 'lamthao1994', 'thao123456', '213416985', '0376529187', 18000000, '02-10-1994', N'Ba Ngọc Lam', 'thao', 'thao123@gmail.com', N'Mộ Đức, Quảng Ngãi', '2'),
+	('7', 'ducbao1990', 'bao123456', '213218160', '0347483567', 10000000, '04-23-1990', N'Trần Đức', N'Bảo', 'bao123@gmail.com', N'Nghĩa Hành, Quảng Ngãi', '2'),
+	('8', 'bichdieu1992', 'dieu123456', '213415642', '0967217358', 9000000, '02-18-1992', N'Lê Bích', N'Diệu', 'dieu123@gmail.com', N'Mộ Đức, Quảng Ngãi', '2'),
+	('9', 'tanbut2000', 'but123456', '212718752', '0332142856', 8000000, '03-09-2000', N'Đỗ Tấn', N'Bút', 'but123@gmail.com', N'Ba Tơ, Quảng Ngãi', '2'),
+	('10', 'hanhgiang1995', 'giang123456', '212314927', '0923167840', 12000000, '12-17-1995', N'Nguyễn Hạnh', N'Giang', 'giang123@gmail.com', N'Mộ Đức, Quảng Ngãi', '2'),
+	('11', 'tuantrai1990', 'trai123456', '211911337', '0394521678', 18000000, '02-13-1990', N'Trần Tuấn', N'Trãi', 'trai123@gmail.com', N'Đức Phổ, Quảng Ngãi', '3'),
+	('12', 'leduan1987', 'duan123456', '213412845', '0125234945', 12000000, '05-14-1987', N'Nguyễn Lê', N'Duẩn', 'duan123@gmail.com', N'Nghĩa Hành, Quảng Ngãi', '3'),
+	('13', 'minhthuy2000', 'thuy123456', '212317840', '0338741365', 10000000, '01-07-2000', N'Lê Minh', N'Thùy', 'thuy123@gmail.com', N'TP Quảng Ngãi, Quảng Ngãi', '3'),
+	('14', 'camvien1994', 'vien123456', '212117438', '0325498174', 8500000, '11-15-1994', N'Võ Cẩm', N'Viên', 'vien123@gmail.com', N'Trà Bồng, Quảng Ngãi', '3'),
+	('15', 'thuytrang1996', 'trang123456', '211314135', '0394528145', 9000000, '03-11-1956', N'Phan Thùy', 'Trang', 'trang123@gmail.com', N'Sơn Trà, Quảng Ngãi', '3');
 
 -- insert NguoiThan
 insert into NguoiThan (ID_Employee, Fname, Lname, Addr, Phone, Relation) values 
