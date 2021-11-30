@@ -6,7 +6,17 @@ export default function ApexChart(props) {
     const options = {
         chart: {
             animations: {
-                enabled: false,
+                enabled: true,
+                easing: 'easeinout',
+                speed: 800,
+                animateGradually: {
+                    enabled: true,
+                    delay: 150
+                },
+                dynamicAnimation: {
+                    enabled: true,
+                    speed: 350
+                }
             },
             type: 'bar',
             height: 350,

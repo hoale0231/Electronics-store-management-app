@@ -4,8 +4,9 @@ go
 EXEC sys.sp_addmessage  
 	@msgnum   = 51000  
 	,@severity = 16  
-	,@msgtext  = N'Product type much be Device or Accessory' 
+	,@msgtext  = N'Insert only one product at a time' 
 	,@lang = 'us_english'
+	,@replace = 'REPLACE'
 go
 
 EXEC sys.sp_addmessage  
@@ -13,6 +14,7 @@ EXEC sys.sp_addmessage
 	,@severity = 16  
 	,@msgtext  = N'Price much larger 1.2 PriceIn' 
 	,@lang = 'us_english'
+	,@replace = 'REPLACE'
 go
 
 EXEC sys.sp_addmessage  
@@ -20,11 +22,12 @@ EXEC sys.sp_addmessage
 	,@severity = 16  
 	,@msgtext  = N'%s is not valid!' 
 	,@lang = 'us_english'
+	,@replace = 'REPLACE'
 go
 
 -- Cau 4
-
-create or alter function getValidSanPhamID(@ProdType nvarchar(100), @DeviceType nvarchar(100))
+-- function 1
+create or alter function getValidSanPhamID(@ProdType nvarchar(100), @DeviceType nvarchar(100) = 'Other')
 returns char(9)
 as 
 begin
@@ -66,9 +69,9 @@ begin
 		begin
 			set @id = @id + 'KH';
 			if @ProdType = 'Device'
-				insert into @existsID select ID from ThietBiDienTu where ID like '[T][B][K][H]%';
+				insert into @existsID select ID from ThietBiDienTu where left(ID,4) = 'TBKH';
 			else if @ProdType = 'Accessory'
-				insert into @existsID select ID from ThietBiDienTu where ID like '[P][K][K][H]%';			
+				insert into @existsID select ID from PhuKien where left(ID, 4) like 'PKKH';			
 		end
 	-- declare counter, cursor, currID for query
 	declare @counter int;
@@ -90,14 +93,14 @@ begin
 	return @id + right('00000' + cast(@counter as varchar(5)), 5)
 end;
 go
-
-select * from SanPham
+-- example function 1
 select dbo.getValidSanPhamID('Device', 'Laptop') as NEW_ID
-select dbo.getValidSanPhamID('Device', 'Phone') as NEW_ID
+select dbo.getValidSanPhamID('Accessory', 'HeadPhone') as NEW_ID
 select * from SanPham
 where ID = dbo.getValidSanPhamID('Device', 'Laptop')
 go
 
+-- function 2
 create or alter function getCurrentPrice(@ID char(9))
 returns int
 as begin 
@@ -111,12 +114,14 @@ as begin
 	return (1 - @promoLevel/100.0) * (select Price from SanPham where SanPham.ID = @ID)
 end
 go
-
+-- example function 2
 select ID, price, dbo.getCurrentPrice(ID) as currentPrice
 from SanPham
 where Price != dbo.getCurrentPrice(ID)
 go
+
 -- Cau 1 
+-- procedure insert
 create or alter procedure insertSanPham
 		-- Sanpham
 		@ID          CHAR(9)		= NULL,
@@ -156,11 +161,6 @@ begin
 				throw 52000, @msg0, 1;
 			end 
 
-		if @Price < @PriceIn * 1.2
-			begin
-				DECLARE @msg1 NVARCHAR(2048) = FORMATMESSAGE(51001);  
-				throw 51001, @msg1, 1;
-			end
 		-- insert Sanpham
 		insert into SanPham ( ID,   ProdName,  PriceIn,  Price, Insurance,  Other, ProdType, manufacture,  TotalQuantity,  Available) 
 		values				( @ID, @ProdName, @PriceIn, @Price, @Insurance, @Other, @ProdType,  @manufacture, 0, @Available)
@@ -206,150 +206,118 @@ begin
 			end
 		else 
 			begin
-				DECLARE @msg2 NVARCHAR(2048) = FORMATMESSAGE(51000);  
-				throw 51000, @msg2, 1;
-			end
+				DECLARE @msg1 NVARCHAR(2048) = FORMATMESSAGE(52000, 'ID');  
+				throw 52000, @msg1, 1;
+			end 
+		select @ID as ID
 	COMMIT TRANSACTION;
 	set nocount off;
 	set xact_abort off;
 END;
 go
-
-delete from SanPham where ID = 'TBLT00007'
-select * from SanPham
-exec insertSanPham @ID = 'TBLT00007',  @ProdName = 'GIGABYTE Gaming G5',  @PriceIn = 22500000,  @Price = 28000000,  @Insurance = 12,  @Other = 'LED keyboard',  @Manufacture = 'Gigabyte',   @ProdType = 'Device', @Battery = '4-cell, 41Wh',  @DateRelease = '01-01-2021',  @Screen = '15.6", Full HD (1920 x 1080), 144Hz', @RAM = '16 GBDDR4 3200 MHz',  @DeviceType = 'Laptop',  @CPU_Chip = 'i510500H2.5GHz',  @GPU = 'RTX 3060 6GB',  @HardDisk = '512 GB SSD NVMe PCIe' 
-exec insertSanPham @ID = 'TBDT00007',  @ProdName = 'GIGABYTE Gaming G5',  @PriceIn = 22500000,  @Price = 28000000,  @Insurance = 12,  @Other = 'LED keyboard',  @Manufacture = 'Gigabyte',   @ProdType = 'Device', @Battery = '4-cell, 41Wh',  @DateRelease = '01-01-2021',  @Screen = '15.6", Full HD (1920 x 1080), 144Hz', @RAM = '16 GBDDR4 3200 MHz',  @DeviceType = 'Laptop',  @CPU_Chip = 'i510500H2.5GHz',  @GPU = 'RTX 3060 6GB',  @HardDisk = '512 GB SSD NVMe PCIe' 
+-- example procedure insert
+delete from SanPham where ProdName = 'test'
+exec insertSanPham @ID = 'PKCH00008',  @ProdName = 'test',  @PriceIn = 1,  @Price = 2, @ProdType = 'Device', @DeviceType = 'Laptop'
+exec insertSanPham @ID = 'TBLT00008',  @ProdName = 'test',  @PriceIn = 1,  @Price = 2, @ProdType = 'Device', @DeviceType = 'Laptop'
+select * from SanPham where ID = 'test'
 go
 
 -- Cau 2
+-- trigger 1
 create or alter trigger delete_Sanpham on SanPham
 instead of delete
 as begin
-	-- Get ID of product
 	declare @ID char(9);
-	select @ID = ID from deleted;
-	-- Set available = 0
-	update SanPham set Available = 0 where ID = @ID;
-	declare @Count int;
-	-- Count orders contain this product
-	select @Count = COUNT(*) 
-	from SanPham_Thuoc_DonHang 
-	where ID_Prod = @ID;
-	-- If no order contain this order, delete it
-	if @Count = 0 
-		delete from SanPham where ID = @ID;
+	declare deleteProductCursor cursor for select ID from deleted;
+	open deleteProductCursor;
+
+	fetch next from deleteProductCursor into @ID;
+	while @@FETCH_STATUS = 0
+	begin
+		-- Set available = 0
+		update SanPham set Available = 0 where ID = @ID;
+		declare @Count int;
+		-- Count orders contain this product
+		select @Count = COUNT(*) 
+		from SanPham_Thuoc_DonHang 
+		where ID_Prod = @ID;
+		-- If no order contain this order, delete it
+		if @Count = 0 
+			delete from SanPham where ID = @ID;
+
+		fetch next from deleteProductCursor into @ID;
+	end
+	close deleteProductCursor;
+	deallocate deleteProductCursor;
 end
 go
+-- example trigger 1
+delete from SanPham where ID = 'TBLT00008'
+select * from SanPham where ID = 'TBLT00008'
+go
 
-create or alter trigger update_price on SanPham
-after insert, update
+delete from SanPham where ID = 'TBLT00008'
+select * from SanPham where ID = 'TBLT00008'
+go
+-- trigger 2
+create or alter trigger insert_SanPham on SanPham
+after insert
 as begin
 	set nocount on;
 	set xact_abort on;
 	BEGIN TRANSACTION;
-		declare @price int, @priceIn int;
-		declare priceCursor cursor for select PriceIn, Price from inserted;
-		open priceCursor;
-		fetch next from priceCursor into @priceIn, @price;
-		while @@FETCH_STATUS = 0
-		begin
-			if @price < @priceIn * 1.2
+		declare @price int, @priceIn int, @Insurance int, @ID char(9), @ProdType nvarchar(100), @ID_branch char(9);
+		select @priceIn = PriceIn, @price = Price, @Insurance = Insurance, @ID = ID, @ProdType = ProdType from inserted;
+
+		if 1 < (select Count(ID) from inserted)
+			begin
+				DECLARE @msg NVARCHAR(2048) = FORMATMESSAGE(51000);  
+				throw 51000, @msg, 1;
+			end 
+
+		if left(@ID, 2) != left(dbo.getValidSanPhamID(@ProdType, 'Other'), 2)
 				begin
-					DECLARE @msg NVARCHAR(2048) = FORMATMESSAGE(51001);  
-					throw 51001, @msg, 1;
+					DECLARE @msg0 NVARCHAR(2048) = FORMATMESSAGE(52000, 'ID');  
+					throw 52000, @msg0, 1;
 				end
 			
-			fetch next from priceCursor into @priceIn, @price;
+		if @Insurance < 0
+			begin
+				DECLARE @msg1 NVARCHAR(2048) = FORMATMESSAGE(52000, 'Insurance');  
+				throw 52000, @msg1, 1;
+			end
+
+		if @price < @priceIn * 1.2
+			begin
+				DECLARE @msg2 NVARCHAR(2048) = FORMATMESSAGE(51001);  
+				throw 51001, @msg2, 1;
+			end
+
+		declare branchCursor cursor for select ID from ChiNhanh
+		open branchCursor;
+		fetch next from branchCursor into @ID_branch;
+		while @@FETCH_STATUS = 0
+		begin
+			insert into ChiNhanh_Ban_SanPham (ID_Branch, ID_Prod, Quantity)
+			values (@ID_branch, @ID, 0)
+			fetch next from branchCursor into @ID_branch;
 		end
-		close priceCursor;
-		deallocate priceCursor;
+		close branchCursor;
+		deallocate branchCursor;
+
 	COMMIT TRANSACTION;
 	set nocount off;
 	set xact_abort off;
 	end;
 go
-
-update SanPham
-set price = 2, PriceIn = 2
-where ID = 'TBLT00001'
-go
-
-create or alter trigger update_totalQuantity on ChiNhanh_Ban_SanPham
-after insert, update, delete
-as	begin
-	set nocount on;
-	set xact_abort on;
-	BEGIN TRANSACTION;
-		declare @Qty int, @prodID char(9);
-		-- on insert
-		declare productCursor cursor for select ID_Prod, Quantity from inserted;
-		open productCursor;
-		fetch next from productCursor into @prodID, @Qty;
-		while @@FETCH_STATUS = 0
-		begin
-			if @Qty < 0
-				begin
-					DECLARE @msg NVARCHAR(2048) = FORMATMESSAGE(52000, 'Quantity');  
-					throw 52000, @msg, 1;
-				end
-			update SanPham
-			set TotalQuantity = (select TotalQuantity from SanPham where ID = @prodID) + @Qty
-			where ID = @prodID
-			fetch next from productCursor into @prodID, @Qty;
-		end
-		close productCursor;
-		deallocate productCursor;
-		-- on delete
-		declare productCursor cursor for select ID_Prod, Quantity from deleted;
-		open productCursor;
-		fetch next from productCursor into @prodID, @Qty;
-		while @@FETCH_STATUS = 0
-		begin
-			update SanPham
-			set TotalQuantity = (select TotalQuantity from SanPham where ID = @prodID) - @Qty
-			where ID = @prodID
-			fetch next from productCursor into @prodID, @Qty;
-		end
-		close productCursor;
-		deallocate productCursor;
-	commit TRANSACTION;
-	set nocount off;
-	set xact_abort off;
-	end;
+-- example trigger 2
+exec insertSanPham @ID = 'TBLT00008',  @ProdName = 'test',  @PriceIn = 1,  @Price = 1, @ProdType = 'Device', @DeviceType = 'Laptop'
+exec insertSanPham @ID = 'TBLT00008',  @ProdName = 'test',  @PriceIn = 1,  @Price = 2, @Insurance = -1, @ProdType = 'Device', @DeviceType = 'Laptop'
+update SanPham set ID = 'PKLT00001' where ID = 'TBLT00001'
 go
 
 -- Cau 3
-create or alter procedure getInfoProduct (@ID char(9))
-as 
-begin
-	if left(@ID, 4) = 'TBLT'
-		select * from SanPham P, ThietBiDienTu T, Laptop D
-		where P.ID = @ID and T.ID = @ID and D.ID = @ID
-	else if left(@ID, 4) = 'TBDT'
-		select * from SanPham P, ThietBiDienTu T, DienThoai D
-		where P.ID = @ID and T.ID = @ID and D.ID = @ID
-	else if left(@ID, 4) = 'TBMB'
-		select * from SanPham P, ThietBiDienTu T, MayTinhBang D
-		where P.ID = @ID and T.ID = @ID and D.ID = @ID
-	else if left(@ID, 4) = 'PKCH'
-		select * from SanPham P, PhuKien T, Chuot D
-		where P.ID = @ID and T.ID = @ID and D.ID = @ID
-	else if left(@ID, 4) = 'PKTN'
-		select * from SanPham P, PhuKien T, TaiNghe D
-		where P.ID = @ID and T.ID = @ID and D.ID = @ID
-	else if left(@ID, 4) = 'TBKH'
-		select * from SanPham P, ThietBiDienTu T
-		where P.ID = @ID and T.ID = @ID
-	else if left(@ID, 4) = 'PKKH'
-		select * from SanPham P, PhuKien T
-		where P.ID = @ID and T.ID = @ID
-	else select * from SanPham P where P.ID = @ID
-end
-go
-
-exec getInfoProduct @ID = 'PKCH00001' 
-go
-
+-- procedure 1
 create or alter procedure getProductsOfType 
 (@Type nvarchar(100) = 'All', @DESC int = 0, @orderBy varchar(100) = NULL, @qty bigint = 5, @offset int = 0)
 as	begin
@@ -390,14 +358,11 @@ as	begin
 		offset (@offset * @qty) rows) T
 end
 go
-
-exec getProductsOfType @Type = 'All', @qty = -1
-exec getProductsOfType @Type = 'Mouse', @orderBy = 'CurrPrice'
-exec getProductsOfType @Type = 'Mouse', @orderBy = 'CurrPrice', @offset = 1
-exec getProductsOfType @Type = 'HeadPhone', @orderBy = 'Insurance', @qty = 2, @desc = 1
-exec getProductsOfType @Type = 'HeadPhone', @orderBy = 'Insurance', @qty = 2, @offset = 4, @desc = 1
+-- example procedure 1
+exec getProductsOfType @Type = 'Mouse', @orderBy = 'TotalQuantity', @qty = -1
+exec getProductsOfType @Type = 'HeadPhone', @orderBy = 'CurrPrice', @qty = 3, @offset = 2, @desc = 1
 go
-
+-- procedure 2
 create or alter procedure getSummaryProduct (@ProdType nvarchar(100) = 'All') as
 	select BranchName, DeviceType, SUM(Quantity) as TotalProduct
 	from ChiNhanh_Ban_SanPham, SanPham, ChiNhanh, ThietBiDienTu
@@ -411,10 +376,179 @@ create or alter procedure getSummaryProduct (@ProdType nvarchar(100) = 'All') as
 	group by ID_Branch, BranchName, ProdType, AccsoryType
 	having AccsoryType = @ProdType or ProdType = @ProdType or @ProdType = 'All'
 go
-
+-- example procedure 2
 exec getSummaryProduct @ProdType = 'Accessory'
 go
-		
+
+-- Cau 5
+-- extra trigger
+create or alter trigger delete_DonHang on SanPham_Thuoc_DonHang
+after delete
+as	begin
+	set nocount on;
+	set xact_abort on;
+	BEGIN TRANSACTION;
+		declare @ID_Prod char(9);
+		select @ID_Prod = ID_Prod from deleted
+
+		delete from SanPham
+		where ID = @ID_Prod and Available = 0
+	commit TRANSACTION;
+	set nocount off;
+	set xact_abort off;
+	end;
+go
+
+create or alter trigger update_SanPham on SanPham
+after update
+as begin
+	set nocount on;
+	set xact_abort on;
+	BEGIN TRANSACTION;
+		declare @price int, @priceIn int, @Insurance int, @ID char(9), @ProdType nvarchar(100);
+		declare productCursor cursor for select PriceIn, Price, Insurance, ID, ProdType from inserted;
+		open productCursor;
+		fetch next from productCursor into @priceIn, @price, @Insurance, @ID, @ProdType;
+		while @@FETCH_STATUS = 0
+		begin
+			if left(@ID, 2) != left(dbo.getValidSanPhamID(@ProdType, 'Other'), 2)
+				begin
+					DECLARE @msg0 NVARCHAR(2048) = FORMATMESSAGE(52000, 'ID');  
+					throw 52000, @msg0, 1;
+				end
+			
+			if @Insurance < 0
+				begin
+					DECLARE @msg1 NVARCHAR(2048) = FORMATMESSAGE(52000, 'Insurance');  
+					throw 52000, @msg1, 1;
+				end
+
+			if @price < @priceIn * 1.2
+				begin
+					DECLARE @msg2 NVARCHAR(2048) = FORMATMESSAGE(51001);  
+					throw 51001, @msg2, 1;
+				end
+			
+			fetch next from productCursor into @priceIn, @price, @Insurance, @ID, @ProdType;
+		end
+		close productCursor;
+		deallocate productCursor;
+	COMMIT TRANSACTION;
+	set nocount off;
+	set xact_abort off;
+end;
+go
+
+create or alter trigger instead_insert_ChiNhanh_Ban_SanPham 
+on ChiNhanh_Ban_SanPham
+instead of insert as
+begin 
+	set nocount on;
+	set xact_abort on;
+	BEGIN TRANSACTION;
+		declare @ID_branch char(9), @ID_Prod char(9), @Quantity int;
+		declare qtyCursor cursor for select ID_Branch, ID_Prod, Quantity from inserted;
+		open qtyCursor;
+		fetch next from qtyCursor into @ID_branch, @ID_Prod, @Quantity;
+		while @@FETCH_STATUS = 0
+		begin
+			if exists (select * from ChiNhanh_Ban_SanPham where ID_Branch = @ID_branch and ID_Prod = @ID_Prod)
+			begin
+				update ChiNhanh_Ban_SanPham set Quantity += @Quantity where ID_Branch = @ID_branch and ID_Prod = @ID_Prod
+			end
+			else begin
+				insert into ChiNhanh_Ban_SanPham (ID_Branch, ID_Prod, Quantity) values (@ID_branch, @ID_Prod, @Quantity)
+			end
+			fetch next from qtyCursor into @ID_branch, @ID_Prod, @Quantity;
+		end
+		close qtyCursor;
+		deallocate qtyCursor;
+	COMMIT TRANSACTION;
+	set nocount off;
+	set xact_abort off;
+end
+
+go
+
+create or alter trigger inset_update_delete_ChiNhanh_Ban_SanPham on ChiNhanh_Ban_SanPham
+after insert, update, delete
+as	begin
+	set nocount on;
+	set xact_abort on;
+	BEGIN TRANSACTION;
+		declare @Qty int, @prodID char(9);
+		-- on insert
+		declare BranchProductCursor cursor for select ID_Prod, Quantity from inserted;
+		open BranchProductCursor;
+		fetch next from BranchProductCursor into @prodID, @Qty;
+		while @@FETCH_STATUS = 0
+		begin
+			if @Qty < 0
+				begin
+					DECLARE @msg NVARCHAR(2048) = FORMATMESSAGE(52000, 'Quantity');  
+					throw 52000, @msg, 1;
+				end
+			update SanPham
+			set TotalQuantity = (select TotalQuantity from SanPham where ID = @prodID) + @Qty
+			where ID = @prodID
+			fetch next from BranchProductCursor into @prodID, @Qty;
+		end
+		close BranchProductCursor;
+		deallocate BranchProductCursor;
+		-- on delete
+		declare BranchProductCursor cursor for select ID_Prod, Quantity from deleted;
+		open BranchProductCursor;
+		fetch next from BranchProductCursor into @prodID, @Qty;
+		while @@FETCH_STATUS = 0
+		begin
+			update SanPham
+			set TotalQuantity = (select TotalQuantity from SanPham where ID = @prodID) - @Qty
+			where ID = @prodID
+			fetch next from BranchProductCursor into @prodID, @Qty;
+		end
+		close BranchProductCursor;
+		deallocate BranchProductCursor;
+	commit TRANSACTION;
+	set nocount off;
+	set xact_abort off;
+	end;
+go
+
+-- extra procedure
+create or alter procedure getInfoProduct (@ID char(9))
+as 
+begin
+	if left(@ID, 4) = 'TBLT'
+		select * from SanPham P, ThietBiDienTu T, Laptop D
+		where P.ID = @ID and T.ID = @ID and D.ID = @ID
+	else if left(@ID, 4) = 'TBDT'
+		select * from SanPham P, ThietBiDienTu T, DienThoai D
+		where P.ID = @ID and T.ID = @ID and D.ID = @ID
+	else if left(@ID, 4) = 'TBMB'
+		select * from SanPham P, ThietBiDienTu T, MayTinhBang D
+		where P.ID = @ID and T.ID = @ID and D.ID = @ID
+	else if left(@ID, 4) = 'PKCH'
+		select * from SanPham P, PhuKien T, Chuot D
+		where P.ID = @ID and T.ID = @ID and D.ID = @ID
+	else if left(@ID, 4) = 'PKTN'
+		select * from SanPham P, PhuKien T, TaiNghe D
+		where P.ID = @ID and T.ID = @ID and D.ID = @ID
+	else if left(@ID, 4) = 'TBKH'
+		select * from SanPham P, ThietBiDienTu T
+		where P.ID = @ID and T.ID = @ID
+	else if left(@ID, 4) = 'PKKH'
+		select * from SanPham P, PhuKien T
+		where P.ID = @ID and T.ID = @ID
+	else select * from SanPham P where P.ID = @ID
+end
+go
+
+create or alter procedure getQuantityProductBranchs (@ID char(9)) as
+	select ID, Quantity
+	from ChiNhanh, ChiNhanh_Ban_SanPham
+	where ID_Prod = @ID and ID_Branch = ID
+go
+
 create or alter procedure updateSanPham
 		-- Sanpham
 		@ID          CHAR(9),
@@ -487,21 +621,4 @@ begin
 	set nocount off;
 	set xact_abort off;
 END;
-go
-
-create or alter trigger deleteDonHang on SanPham_Thuoc_DonHang
-after delete
-as	begin
-	set nocount on;
-	set xact_abort on;
-	BEGIN TRANSACTION;
-		declare @ID_Prod char(9);
-		select @ID_Prod = ID_Prod from deleted
-
-		delete from SanPham
-		where ID = @ID_Prod and Available = 0
-	commit TRANSACTION;
-	set nocount off;
-	set xact_abort off;
-	end;
 go
