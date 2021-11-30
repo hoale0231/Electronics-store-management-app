@@ -54,11 +54,13 @@ go
 
 update NhanVien
 set Salary = 19000000
-where ID = 1
+where ID = '1'
+
+select * from NhanVien where ID= '1';
 
 update NhanVien
 set Salary = 26000000
-where ID = 1
+where ID = '1'
 
 go
 
@@ -77,9 +79,9 @@ as
 	end
 
 go
-
-delete from NhanVien where ID = 2;
-delete from NhanVien where ID = 8;
+select * from NguoiThan;
+delete from NhanVien where ID = '1';
+delete from NhanVien where ID = '8';
 
 go
 
@@ -144,10 +146,10 @@ go
 		return @sl
 	end
 go
-	print dbo.slnv_tuoi(30);
-	print dbo.slnv_tuoi(18);
+	select dbo.slnv_tuoi(25) snv;
+	select dbo.slnv_tuoi(30) snv;
 go
 
 
 
-select * from NhanVien;
+-- select * from NhanVien;
