@@ -1,4 +1,6 @@
-﻿create or alter procedure insertNhanVien 
+﻿use db_a2
+go
+create or alter procedure insertNhanVien 
 	@ID			char(9),
 	@Username	nvarchar(100),
 	@Passwd		nvarchar(100),
