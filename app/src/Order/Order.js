@@ -1,7 +1,7 @@
 import BootstrapTable from "react-bootstrap-table-next";
 import { Button, ButtonGroup } from 'react-bootstrap';
 import OrderDescription from "./OrderDescription";
-import filterFactory from 'react-bootstrap-table2-filter';
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import { Component } from "react";
 
 export default class Order extends Component {
@@ -68,12 +68,12 @@ export default class Order extends Component {
   };
 
   columns = [
-    { dataField: "ID", text: "Order ID", sort: true},
-    { dataField: "TimeCreated", text: "Time Created", sort: true},
+    { dataField: "ID", text: "Order ID", sort: true, filter: textFilter()},
+    { dataField: "TimeCreated", text: "Time Created", sort: true, filter: textFilter()},
     { dataField: "SumPrices", text: "Sum Prices"},
-    { dataField: "ID_Customer", text: "Customer ID"},
-    { dataField: "ID_Employee", text: "Employee ID"},
-    { dataField: "ID_Ad", text: "CTKM ID", }
+    { dataField: "ID_Customer", text: "Customer ID", filter: textFilter()},
+    { dataField: "ID_Employee", text: "Employee ID", filter: textFilter()},
+    { dataField: "ID_Ad", text: "CTKM ID", filter: textFilter()}
   ];
 
   handleLoadMore() {

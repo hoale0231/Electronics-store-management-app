@@ -1,9 +1,8 @@
 import BootstrapTable from "react-bootstrap-table-next";
 import { Button, ButtonGroup } from 'react-bootstrap';
 import PIODescription from "./PIODescription";
-import filterFactory from 'react-bootstrap-table2-filter';
+import filterFactory, {textFilter} from 'react-bootstrap-table2-filter';
 import { Component } from "react";
-import { DataManager, Query } from "@syncfusion/ej2-data";
 import HotProduct from "./HotProduct"
 
 export default class ProductInOrder extends Component {
@@ -12,7 +11,6 @@ export default class ProductInOrder extends Component {
     this.state = {
       pioDescription_1: -1,
       pioDescription_2: -1,
-      originalPIO: [],
       pio: [],
       numElement: 10,
       hotProduct: false
@@ -22,7 +20,6 @@ export default class ProductInOrder extends Component {
     this.handleLoadMore = this.handleLoadMore.bind(this)
     this.setPIODescription = this.setPIODescription.bind(this)
     this.deletePIO = this.deletePIO.bind(this)
-    this.searchByOrderID = this.searchByOrderID.bind(this)
     this.enableHotProduct = this.enableHotProduct.bind(this)
     this.disableHotProduct = this.disableHotProduct.bind(this)
   }
@@ -76,8 +73,8 @@ export default class ProductInOrder extends Component {
   };
 
   columns = [
-    { dataField: "ID_Order", text: "Order ID", sort: true},
-    { dataField: "ID_Prod", text: "Product ID", sort: true},
+    { dataField: "ID_Order", text: "Order ID", sort: true, filter: textFilter()},
+    { dataField: "ID_Prod", text: "Product ID", sort: true, filter: textFilter()},
     { dataField: "Price", text: "Price"},
     { dataField: "Quantity", text: "Quantity"}
   ];
@@ -93,22 +90,6 @@ export default class ProductInOrder extends Component {
         pioDescription_1: id_1,
         pioDescription_2: id_2
     })
-  }
-
-  // Filter
-  searchByOrderID(event) {
-    let value = event.target.value;
-    let data = new DataManager(this.state.pio).executeLocal(new Query().where("ID_Order", "startswith", value, true));
-    if (!value) {
-        this.setState({
-            pio: this.state.originalPIO
-        });
-    }
-    else {
-        this.setState({
-            pio: data
-        });
-    }
   }
 
   enableHotProduct() {
@@ -131,7 +112,6 @@ export default class ProductInOrder extends Component {
         <Button className="customButton" variant="success" onClick={() => {this.setPIODescription(0, 0)}}>Add Product in Order</Button>
         <Button className="customButton" style={{marginLeft: '1vw'}} onClick={() => {this.enableHotProduct()}}>Get Hot Product</Button>
         <div>
-        <input className="input-search" style={{marginTop: '1vh'}} type="text" title="Type in a name" placeholder="Lọc Order ID" onKeyUp={this.searchByOrderID}/>
         </div>
         <div className="table-custom">
           <BootstrapTable keyField="id" data={this.state.pio.slice(0, this.state.numElement)} columns={this.columns} rowEvents={this.rowEvents} filter={filterFactory()}/>
