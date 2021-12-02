@@ -39,12 +39,6 @@ export default function OrderDescription(props) {
       event.preventDefault();
       return
     }
-    if (form.Price.value === "") {
-        alert("Import Price!")
-        event.stopPropagation();
-        event.preventDefault();
-        return
-    }
     if (form.Quantity.value === "") {
         alert("Import Quantity!")
         event.stopPropagation();
@@ -94,7 +88,7 @@ export default function OrderDescription(props) {
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Prod" attrName="Product ID" required={true} md="4" disable={action === 'Edit'}/>
             </Row>
             <Row className="mb-3">
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Price" attrName="Price" required={true} md="4"/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Price" attrName="Price" required={true} md="4" disable={true}/>
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Quantity" attrName="Quantity" required={true} md="4"/>
             </Row>
             <Modal.Footer>

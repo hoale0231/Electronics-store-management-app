@@ -22,4 +22,4 @@ app.register_blueprint(Staff)
 
 # Remove debug param after finished testing
 # Debug mode detecting change in script and restart server automatically
-app.run(debug=1)
+app.run()

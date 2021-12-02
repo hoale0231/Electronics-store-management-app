@@ -25,8 +25,10 @@ function NavBarHeader() {
               <NavDropdown.Item href="/Sales">Sales</NavDropdown.Item>
               <NavDropdown.Item href="/SalesManagement">Sales Management</NavDropdown.Item>
             </NavDropdown>
-            <Nav.Link href="/Order">Order</Nav.Link>
-            <Nav.Link href="/ProductInOrder">Product in Order</Nav.Link>
+            <NavDropdown title="Order" id="basic-nav-dropdown">
+              <NavDropdown.Item href="/Order">Order</NavDropdown.Item>
+              <NavDropdown.Item href="/ProductInOrder">Product in Order</NavDropdown.Item>
+            </NavDropdown>
             <Nav.Link href="/Customer">Customer</Nav.Link>
             <Nav.Link href="/Staff">Staff</Nav.Link>
           </Nav>

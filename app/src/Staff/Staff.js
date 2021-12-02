@@ -69,6 +69,7 @@ export default function Staff() {
 
   return (
     <div className="popup_container">
+      <h1>Staff Table</h1>
       <Button className="customButton" variant="success" onClick={() => { setstaffDescription(0) }}>Add staff</Button>
 
       <div className="table-custom">

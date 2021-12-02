@@ -57,7 +57,7 @@ export default function Customer() {
 
     function isInt(value) {
         return !isNaN(value) && 
-               parseInt(Number(value)) == value && 
+               parseInt(Number(value)) === value && 
                !isNaN(parseInt(value, 10));
     }
 
@@ -74,7 +74,8 @@ export default function Customer() {
 
     return (
         <div className="popup_container">
-            <Button className="customButton" variant="success" onClick={() => { setCustomerDescription(-2) }}>Add staff</Button>
+            <h1>Customer Table</h1>
+            <Button className="customButton" variant="success" onClick={() => { setCustomerDescription(-2) }}>Add Customer</Button>
             <div>
                 <Row className="g-2">
                 <Col md>

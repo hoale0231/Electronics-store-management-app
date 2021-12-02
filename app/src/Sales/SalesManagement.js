@@ -116,6 +116,7 @@ export default function SalesManagement() {
 
   return (
     <div className="popup_container">
+      <h1>Sales Management Table</h1>
       <div>
         {selectQueryOptions()}
       </div>
@@ -343,6 +344,7 @@ function NewProduct(props) {
   
   return(
     <div className="popup-background">
+
       <Modal.Dialog className="popup">
         <Modal.Header closeButton onClick={() => setAddProduct(0)}>
           <Modal.Title>{title}</Modal.Title>

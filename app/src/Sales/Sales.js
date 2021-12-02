@@ -179,6 +179,7 @@ export default function Sales() {
 
   return (
     <div className="popup_container">
+      <h1>Sales Table</h1>
       <div>
         {selectQueryOptions()}
       </div>

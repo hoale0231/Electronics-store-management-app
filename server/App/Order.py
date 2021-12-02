@@ -143,15 +143,14 @@ def addProductInOrder():
     data = request.get_json()
     id_order = data["ID_Order"]
     id_prod = data["ID_Prod"]
-    price = data["Price"]
     qty = data["Quantity"]
 
-    if (id_order == None or id_prod == None or price == None or qty == None):
+    if (id_order == None or id_prod == None or qty == None):
         return Response("Not enough information", status=400)
 
     try:
-        query = "insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values (?, ?, ?, ?)"
-        cursor.execute(query, id_order, id_prod, price, qty)
+        query = "insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values (?, ?, dbo.getCurrentPrice(?), ?)"
+        cursor.execute(query, id_order, id_prod, id_prod, qty)
         conn.commit()
     except pyodbc.Error as e:
         print("ERROR: " + str(e))

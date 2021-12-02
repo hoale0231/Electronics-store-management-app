@@ -90,7 +90,7 @@ export default function OrderDescription(props) {
             <Row className="mb-3">
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID" attrName="ID" required={true} md="4" disable={action === 'Edit'}/>
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="TimeCreated" attrName="Time Created" md="4"/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="SumPrices" attrName="Sum Prices" md="4"/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="SumPrices" attrName="Sum Prices" disable={true} md="4"/>
             </Row>
             <Row className="mb-3">
               <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Customer" attrName="Customer ID" required={true} md="4"/>
