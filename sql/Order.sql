@@ -256,16 +256,17 @@ insert into CTKM_DonHang (ID, TimeStart, TimeEnd, PromoLevel, Condition) values 
 
 select * from CTKM_DonHang
 go
+delete from SanPham_Thuoc_DonHang
 -- Insert San pham thuoc don hang
-insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000001', 'TBLT00001', 29690000, 2);
-insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000002', 'TBLT00007', 28000000, 1);
-insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000003', 'TBLT00007', 28000000, 1);
-insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000004', 'TBLT00007', 28000000, 1);
-insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000004', 'TBDT00001', 22990000, 1);
-insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000003', 'PKCH00001', 200000, 1);
-insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000001', 'PKTN00001', 4190000, 2);
-insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000004', 'PKTN00001', 4190000, 1);
-insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000005', 'TBDT00001', 22990000, 1);
+insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000001', 'TBLT00001', dbo.getCurrentPrice('TBLT00001'), 2);
+insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000002', 'TBLT00007', dbo.getCurrentPrice('TBLT00007'), 1);
+insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000003', 'TBLT00007', dbo.getCurrentPrice('TBLT00007'), 1);
+insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000004', 'TBLT00007', dbo.getCurrentPrice('TBLT00007'), 1);
+insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000004', 'TBDT00001', dbo.getCurrentPrice('TBDT00001'), 1);
+insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000003', 'PKCH00001', dbo.getCurrentPrice('PKCH00001'), 1);
+insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000001', 'PKTN00001', dbo.getCurrentPrice('PKTN00001'), 2);
+insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000004', 'PKTN00001', dbo.getCurrentPrice('PKTN00001'), 1);
+insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values ('DH0000005', 'TBDT00001', dbo.getCurrentPrice('TBDT00001'), 1);
 select * from SanPham_Thuoc_DonHang
 go
 
