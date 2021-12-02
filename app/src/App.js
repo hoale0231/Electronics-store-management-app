@@ -5,6 +5,7 @@ import Product from './Product/Product'
 import Sales from './Sales/Sales'
 import SalesManagement from './Sales/SalesManagement'
 import Order from "./Order/Order";
+import ProductInOrder from "./Order/ProductInOrder";
 import Customer from "./Customer/Customer";
 import Staff from "./Staff/Staff";
 import Home from "./Home";
@@ -25,6 +26,7 @@ function NavBarHeader() {
               <NavDropdown.Item href="/SalesManagement">Sales Management</NavDropdown.Item>
             </NavDropdown>
             <Nav.Link href="/Order">Order</Nav.Link>
+            <Nav.Link href="/ProductInOrder">Product in Order</Nav.Link>
             <Nav.Link href="/Customer">Customer</Nav.Link>
             <Nav.Link href="/Staff">Staff</Nav.Link>
           </Nav>
@@ -45,6 +47,7 @@ function App() {
           <Route path="/Sales" element={<Sales />} />
           <Route path="/SalesManagement" element={<SalesManagement />} />
           <Route path="/Order" element={<Order />} />
+          <Route path="/ProductInOrder" element={<ProductInOrder />} />
           <Route path="/Customer" element={<Customer />} />
           <Route path="/Staff" element={<Staff />} />
         </Routes>

@@ -1,17 +1,15 @@
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap'
 import { useState, useEffect } from "react";
-import BootstrapTable from "react-bootstrap-table-next";
 
 export default function OrderDescription(props) {
-  const {id, setOrderDescription, deleteOrder, action} = props
+  const {id_order, id_prod, setPIODescription, deletePIO, action} = props
   const [info, setInfo] = useState({})
-  const [detail, setDetail] = useState([])
 
   useEffect(() => {
     if (action !== "Edit") {
       return;
     }
-    fetch("/api/order/info?id=" + id)
+    fetch("/api/order/infopio?id_order="+id_order+"&id_prod="+id_prod)
       .then((response) => {
         if (response.ok) {
           return response.json()
@@ -19,34 +17,46 @@ export default function OrderDescription(props) {
           response.text().then(text => { alert(text);})
         }
       })
-      .then((data) => {setDetail(data["detail"]); setInfo(data)})
+      .then((data) => {setInfo(data)})
       .catch((error) => {
         console.error("Error fetching data: ", error);
       })
-  }, [id, action])
+  }, [id_order, id_prod, action])
 
   const [validated, setValidated] = useState(false);
 
   const handleSubmit = (event) => {
     const form = event.currentTarget;
-    if (form.ID_Customer.value === "") {
-      alert("Import Customer ID!")
+    if (form.ID_Order.value === "") {
+      alert("Import Order ID!")
       event.stopPropagation();
       event.preventDefault();
       return
     }
-    if (form.ID_Employee.value === "") {
-      alert("Import Employee ID!")
+    if (form.ID_Prod.value === "") {
+      alert("Import Product ID!")
       event.stopPropagation();
       event.preventDefault();
       return
+    }
+    if (form.Price.value === "") {
+        alert("Import Price!")
+        event.stopPropagation();
+        event.preventDefault();
+        return
+    }
+    if (form.Quantity.value === "") {
+        alert("Import Quantity!")
+        event.stopPropagation();
+        event.preventDefault();
+        return
     }
     setValidated(true);
     if (form.checkValidity() === false) {
       event.preventDefault();
       event.stopPropagation();
     } else {
-      var query = action === "Edit" ? "/api/order/update" : "/api/order/add"
+      var query = action === "Edit" ? "/api/order/updatepio" : "/api/order/addpio"
       const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,7 +65,7 @@ export default function OrderDescription(props) {
       fetch(query, requestOptions)
         .then(response => {
           if (response.ok) {
-            setOrderDescription(-1)
+            setPIODescription(-1, -1)
           } else {
             response.text().then(text => { alert(text); })
           }
@@ -70,37 +80,26 @@ export default function OrderDescription(props) {
     info[name] = value;
   }
 
-  const columns = [
-    { dataField: "ID_Order", text: "Order ID"},
-    { dataField: "Product_Name", text: "Product Name"},
-    { dataField: "Product_Type", text: "Product Type"},
-    { dataField: "Device_Type", text: "Device Type"},
-    { dataField: "Product_Price", text: "Product Price"},
-    { dataField: "Quantity", text: "Quantity"},
-  ];
   return (
     <div className="popup-background">
       <Modal.Dialog className="popup" size="lg">
-        <Modal.Header closeButton onClick={() => setOrderDescription(-1)}>
+        <Modal.Header closeButton onClick={() => setPIODescription(-1, -1)}>
           <Modal.Title>{action}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body className="body-popup">
           <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Row className="mb-3">
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID" attrName="ID" required={true} md="4" disable={action === 'Edit'}/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="TimeCreated" attrName="Time Created" md="4"/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="SumPrices" attrName="Sum Prices" md="4"/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Order" attrName="Order ID" required={true} md="4" disable={action === 'Edit'}/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Prod" attrName="Product ID" required={true} md="4" disable={action === 'Edit'}/>
             </Row>
             <Row className="mb-3">
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Customer" attrName="Customer ID" required={true} md="4"/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Employee" attrName="Employee ID" required={true} md="4"/>
-              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="ID_Ad" attrName="CTKM ID" md="4"/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Price" attrName="Price" required={true} md="4"/>
+              <InputGroupCustom info={info} handleInputChange={handleInputChange} attr="Quantity" attrName="Quantity" required={true} md="4"/>
             </Row>
-            <BootstrapTable keyField="id" data={detail} columns={columns}/>
             <Modal.Footer>
               <Button type="submit">Save Changes</Button>
-              {action === "Edit" ? <Button variant="danger" onClick={() => {deleteOrder(id)}}>Delete Order</Button> : <p/>}
+              {action === "Edit" ? <Button variant="danger" onClick={() => {deletePIO(id_order, id_prod)}}>Delete Order</Button> : <p/>}
             </Modal.Footer>
           </Form>
         </Modal.Body>

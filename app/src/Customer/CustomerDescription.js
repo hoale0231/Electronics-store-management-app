@@ -1,7 +1,7 @@
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap'
 import BootstrapTable from "react-bootstrap-table-next";
 import { Component } from "react";
-import "./customerDescription.css"
+import "./CustomerDescription.css"
 
 export default class CustomerDescription extends Component {
 	constructor(props) {

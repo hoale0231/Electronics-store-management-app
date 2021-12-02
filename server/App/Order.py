@@ -7,7 +7,6 @@ Order = Blueprint('Order', __name__)
 @Order.route("/api/order/all", methods=["GET"])
 def queryAllOrder():
 
-    # type = request.args.get("type")
     query = "select * from DonHang order by cast(ID as char(9))"
 
     try:
@@ -107,4 +106,108 @@ def queryInfo():
 
     results["detail"] = getProductsOfOrder(id)
     
+    return jsonify(results)
+
+@Order.route("/api/order/allpio", methods=["GET"])
+def queryProductInOrder():
+
+    query = "select * from SanPham_Thuoc_DonHang"
+
+    try:
+        cursor.execute(query)
+    except pyodbc.Error as err:
+        print(err)
+        return Response(err.args[1], status=400)
+    colNames = [column[0] for column in cursor.description]
+    results = [dict(zip(colNames, row)) for row in cursor]
+    return jsonify(results)
+
+@Order.route("/api/order/removepio", methods=["POST"])
+def removeProductInOrder():
+    id_order = request.args.get("id_order")
+    id_prod = request.args.get("id_prod")
+
+    if (id_order == None and id_prod == None):
+        return Response("Please provide an ID!", status=400)
+    try:
+        query = "delete from SanPham_Thuoc_DonHang where ID_Order = ? and ID_Prod = ?"
+        cursor.execute(query, id_order, id_prod)
+        conn.commit()
+    except pyodbc.ProgrammingError as e:
+        # send sql error msg back to client
+        return Response(e.args[1], status=400)
+    return Response("Success", status=200)
+
+@Order.route("/api/order/addpio", methods=["POST"])
+def addProductInOrder():
+    data = request.get_json()
+    id_order = data["ID_Order"]
+    id_prod = data["ID_Prod"]
+    price = data["Price"]
+    qty = data["Quantity"]
+
+    if (id_order == None or id_prod == None or price == None or qty == None):
+        return Response("Not enough information", status=400)
+
+    try:
+        query = "insert into SanPham_Thuoc_DonHang (ID_Order, ID_Prod, Price, Quantity) values (?, ?, ?, ?)"
+        cursor.execute(query, id_order, id_prod, price, qty)
+        conn.commit()
+    except pyodbc.Error as e:
+        print("ERROR: " + str(e))
+        return Response(e.args[1], status=400)  #send sql error msg back to client
+    return Response("Success", status=200)
+
+@Order.route("/api/order/updatepio", methods=["POST"])
+def updateProductInOrder():
+    data = request.get_json()
+    id_order = data["ID_Order"]
+    id_prod = data["ID_Prod"]
+    price = data["Price"]
+    qty = data["Quantity"]
+    if (id_order == None or id_prod == None or price == None or qty == None):
+        return Response("Not enough information!", status=400)
+    try:
+        query = '''update SanPham_Thuoc_DonHang 
+                set Price = ?, Quantity = ? 
+                where ID_Order = ? and ID_Prod = ?'''
+        cursor.execute(query, price, qty, id_order, id_prod)
+        conn.commit()
+    except pyodbc.ProgrammingError as e:
+        # send sql error msg back to client
+        return Response(e.args[1], status=400)
+    return Response("Success", status=200)
+
+@Order.route("/api/order/infopio", methods=["GET"])
+def queryPIOInfo():
+    id_order = request.args.get("id_order")
+    id_prod = request.args.get("id_prod")
+
+    if id_order == None or id_prod == None:
+        return Response("Must provide ID!", status=400)
+
+    query = "select * from SanPham_Thuoc_DonHang where ID_Order = ? and ID_Prod = ?"
+
+    try:
+        cursor.execute(query, id_order, id_prod)
+    except pyodbc.Error as err:
+        print(err)
+        return Response(err.args[1], status=400)
+
+    colNames = [column[0] for column in cursor.description]
+    results = dict(zip(colNames, cursor.fetchone()))
+    
+    return jsonify(results)
+
+@Order.route("/api/order/hotproduct", methods=["GET"])
+def getHotProduct():
+    prodType = 'All'
+    query = "exec LikedProduct @prodType = ?"
+    try:
+        cursor.execute(query, prodType)
+    except pyodbc.Error as err:
+        print(err)
+        return Response(err.args[1], status=400)
+    colNames = [column[0] for column in cursor.description]
+    results = [dict(zip(colNames, row)) for row in cursor]
     return jsonify(results)
