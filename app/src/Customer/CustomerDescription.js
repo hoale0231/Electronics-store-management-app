@@ -65,7 +65,7 @@ export default class CustomerDescription extends Component {
 
     isInt(value) {
         return !isNaN(value) && 
-               parseInt(Number(value)) === value && 
+               parseInt(Number(value)) == value && 
                !isNaN(parseInt(value, 10));
     }
     
