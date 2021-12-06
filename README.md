@@ -1,4 +1,4 @@
-# dbs-assignment-2
+# Electronics store management app
 
 ## Install
 ### `Install front end app (React)`
